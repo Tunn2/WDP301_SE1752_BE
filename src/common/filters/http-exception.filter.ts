@@ -40,7 +40,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       typeof message === 'string'
         ? message
         : Array.isArray(message)
-          ? message.join(', ')
+          ? (message as string[]).join(', ')
           : 'Error',
       null,
     );
