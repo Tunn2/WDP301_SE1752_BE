@@ -34,8 +34,9 @@ export class UserController {
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  async findAll() {
+    const users = await this.userService.findAll();
+    return new ResponseDTO(200, true, 'Get users successfully', users);
   }
 
   @Get(':id')
@@ -77,6 +78,6 @@ export class UserController {
     }
 
     const message = await this.userService.importFromExcel(file.buffer);
-    return new ResponseDTO(200, true, message, null);
+    return new ResponseDTO(201, true, message, null);
   }
 }

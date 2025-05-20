@@ -27,8 +27,8 @@ export class UserService {
     return 'This action adds a new user';
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll() {
+    return await this.userRepo.find();
   }
 
   findOne(id: number) {
