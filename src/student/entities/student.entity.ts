@@ -1,3 +1,5 @@
+import { HealthProfile } from 'src/health-profile/entities/health-profile.entity';
+import { MedicineRequest } from 'src/medicine-request/entities/medicine-request.entity';
 import { ParentStudent } from 'src/user/entities/parent-student.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -17,4 +19,13 @@ export class Student {
 
   @OneToMany(() => ParentStudent, (studentUser) => studentUser.student)
   studentUsers: ParentStudent[];
+
+  @OneToMany(() => HealthProfile, (healthProfile) => healthProfile.student)
+  healthProfiles: HealthProfile[];
+
+  @OneToMany(
+    () => MedicineRequest,
+    (medicineRequest) => medicineRequest.student,
+  )
+  medicinesRequests: MedicineRequest[];
 }

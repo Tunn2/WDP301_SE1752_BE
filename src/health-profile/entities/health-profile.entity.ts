@@ -1,27 +1,39 @@
 import { Student } from 'src/student/entities/student.entity';
-import { ParentStudent } from 'src/user/entities/parent-student.entity';
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class HealProfile {
+export class HealthProfile {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @ManyToOne(() => Student, (student) => student)
+  @ManyToOne(() => Student, (student) => student.healthProfiles)
   student: Student;
 
-  @Column()
-  fullName: string;
+  @ManyToOne(() => User, (user) => user.healthProfiles)
+  user: User;
+
+  @Column({ nullable: false })
+  weight: number;
+
+  @Column({ nullable: false })
+  height: number;
 
   @Column()
-  address: string;
+  bloodType: string;
 
-  @OneToMany(() => ParentStudent, (studentUser) => studentUser.student)
-  studentUsers: ParentStudent[];
+  @Column()
+  allergies: string;
+
+  @Column()
+  hearing: number;
+
+  @Column()
+  vision: number;
+
+  @Column()
+  note: string;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  date: Date;
 }

@@ -11,6 +11,12 @@ import { User } from './user/entities/user.entity';
 import { HealthProfileModule } from './health-profile/health-profile.module';
 import { Student } from './student/entities/student.entity';
 import { ParentStudent } from './user/entities/parent-student.entity';
+import { HealthProfile } from './health-profile/entities/health-profile.entity';
+import { MedicineModule } from './medicine/medicine.module';
+import { Medicine } from './medicine/entities/medicine.entity';
+import { MedicineRequestModule } from './medicine-request/medicine-request.module';
+import { UploadModule } from './upload/upload.module';
+import { MedicineRequest } from './medicine-request/entities/medicine-request.entity';
 
 @Module({
   imports: [
@@ -28,7 +34,14 @@ import { ParentStudent } from './user/entities/parent-student.entity';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
-        entities: [User, Student, ParentStudent],
+        entities: [
+          User,
+          Student,
+          ParentStudent,
+          HealthProfile,
+          Medicine,
+          MedicineRequest,
+        ],
         synchronize: true,
         logging: true,
       }),
@@ -37,6 +50,9 @@ import { ParentStudent } from './user/entities/parent-student.entity';
     UserModule,
     StudentModule,
     HealthProfileModule,
+    MedicineModule,
+    MedicineRequestModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
