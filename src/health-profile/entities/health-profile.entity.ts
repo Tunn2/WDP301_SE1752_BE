@@ -13,7 +13,7 @@ export class HealProfile {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @ManyToOne()
+  @ManyToOne(() => Student, (student) => student)
   student: Student;
 
   @Column()
