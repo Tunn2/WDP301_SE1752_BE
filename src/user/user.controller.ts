@@ -11,47 +11,63 @@ import {
   Delete,
   UseInterceptors,
   UploadedFile,
+  Request,
+  UseGuards,
+  Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ResponseDTO } from 'src/common/response-dto/response.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/role.guard';
+import { Roles } from 'src/common/decorators/roles.decorator';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
-
   @Get()
-  async findAll() {
-    const users = await this.userService.findAll();
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'manager')
+  @ApiBearerAuth('JWT-auth')
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Trang hiện tại (mặc định là 1)',
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Giới hạn dữ liệu (mặc định là 20)',
+    type: Number,
+  })
+  async findAll(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '20',
+  ) {
+    const users = await this.userService.findAll(page, limit);
     return new ResponseDTO(200, true, 'Get users successfully', users);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  async findOne(@Param('id') id: string) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Get users successfully',
+      await this.userService.findOne(id),
+    );
   }
 
   @Post('import')
@@ -76,7 +92,6 @@ export class UserController {
     if (!file) {
       return new ResponseDTO(400, false, 'Không có file được gửi lên', null);
     }
-
     const message = await this.userService.importFromExcel(file.buffer);
     return new ResponseDTO(201, true, message, null);
   }

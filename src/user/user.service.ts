@@ -23,24 +23,35 @@ export class UserService {
     private parentStudentRepo: Repository<ParentStudent>,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async findAll(page: string, limit: string) {
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = parseInt(limit, 10) || 10;
+
+    // Đảm bảo page và limit không âm
+    const validPage = Math.max(1, pageNum);
+    const validLimit = Math.max(1, Math.min(limitNum, 100)); // Giới hạn tối đa limit để tránh tải quá nhiều
+
+    // Tính số bản ghi cần bỏ qua (skip)
+    const skip = (validPage - 1) * validLimit;
+
+    // Truy vấn với phân trang
+    const [users, total] = await this.userRepo.findAndCount({
+      skip,
+      take: validLimit,
+    });
+
+    return {
+      users,
+      meta: {
+        total,
+        page: validPage,
+        limit: validLimit,
+      },
+    };
   }
 
-  async findAll() {
-    return await this.userRepo.find();
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async findOne(id: string) {
+    return this.userRepo.findOne({ where: { id } });
   }
 
   async findByPhone(phone: string): Promise<any> {
