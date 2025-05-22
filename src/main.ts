@@ -29,11 +29,11 @@ async function bootstrap() {
     )
     // .addSecurityRequirements('JWT-auth')
     .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory, {
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
-      persistAuthorization: true, // Giữ token sau khi refresh trang
-      security: [{ 'JWT-auth': [] }], // Liên kết với security scheme
+      persistAuthorization: true,
+      security: [{ 'JWT-auth': [] }],
     },
   });
 
