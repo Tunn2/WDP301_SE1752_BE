@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -17,6 +16,10 @@ import { Medicine } from './medicine/entities/medicine.entity';
 import { MedicineRequestModule } from './medicine-request/medicine-request.module';
 import { UploadModule } from './upload/upload.module';
 import { MedicineRequest } from './medicine-request/entities/medicine-request.entity';
+import { AccidentModule } from './accident/accident.module';
+import { Accident } from './accident/entities/accident.entity';
+import { AccidentMedicineModule } from './accident-medicine/accident-medicine.module';
+import { AccidentMedicine } from './accident-medicine/entities/accident-medicine.entity';
 
 @Module({
   imports: [
@@ -41,6 +44,8 @@ import { MedicineRequest } from './medicine-request/entities/medicine-request.en
           HealthProfile,
           Medicine,
           MedicineRequest,
+          Accident,
+          AccidentMedicine,
         ],
         synchronize: true,
         logging: true,
@@ -53,6 +58,8 @@ import { MedicineRequest } from './medicine-request/entities/medicine-request.en
     MedicineModule,
     MedicineRequestModule,
     UploadModule,
+    AccidentModule,
+    AccidentMedicineModule,
   ],
   controllers: [AppController],
   providers: [AppService],

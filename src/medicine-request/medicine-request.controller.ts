@@ -4,6 +4,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Request,
   UploadedFile,
@@ -60,6 +61,16 @@ export class MedicineRequestController {
       true,
       'Medicine request created successfully',
       medicineRequest,
+    );
+  }
+
+  @Get('today')
+  async findToday() {
+    return new ResponseDTO(
+      200,
+      true,
+      'Get medicine request today successfully',
+      await this.medicineRequestService.getMedicineRequestToday(),
     );
   }
 }

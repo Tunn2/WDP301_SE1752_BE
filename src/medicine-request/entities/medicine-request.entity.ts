@@ -7,7 +7,9 @@ export class MedicineRequest {
   @PrimaryGeneratedColumn()
   id: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({
+    type: 'timestamp',
+  })
   date: Date;
 
   @Column()

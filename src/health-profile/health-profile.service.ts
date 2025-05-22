@@ -4,6 +4,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { HealthProfile } from './entities/health-profile.entity';
 import { Repository } from 'typeorm';
 import { Student } from 'src/student/entities/student.entity';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 @Injectable()
 export class HealthProfileService {
@@ -25,6 +30,7 @@ export class HealthProfileService {
       ...request,
       student,
       user: { id: userId },
+      date: dayjs().tz('Asia/Bangkok').toDate(),
     });
     await this.healthProfileRepo.save(newHealthProfile);
   }

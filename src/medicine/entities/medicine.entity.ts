@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { AccidentMedicine } from 'src/accident-medicine/entities/accident-medicine.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Medicine {
@@ -18,4 +19,10 @@ export class Medicine {
 
   @Column()
   type: string;
+
+  @OneToMany(
+    () => AccidentMedicine,
+    (accidentMedicine) => accidentMedicine.medicine,
+  )
+  accidentMedicines: AccidentMedicine[];
 }

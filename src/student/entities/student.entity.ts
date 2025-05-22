@@ -1,3 +1,4 @@
+import { Accident } from 'src/accident/entities/accident.entity';
 import { HealthProfile } from 'src/health-profile/entities/health-profile.entity';
 import { MedicineRequest } from 'src/medicine-request/entities/medicine-request.entity';
 import { ParentStudent } from 'src/user/entities/parent-student.entity';
@@ -28,4 +29,7 @@ export class Student {
     (medicineRequest) => medicineRequest.student,
   )
   medicinesRequests: MedicineRequest[];
+
+  @OneToMany(() => Accident, (accident) => accident.student)
+  accidents: Accident[];
 }

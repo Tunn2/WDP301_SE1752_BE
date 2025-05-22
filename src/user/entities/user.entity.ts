@@ -3,6 +3,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ParentStudent } from './parent-student.entity';
 import { HealthProfile } from 'src/health-profile/entities/health-profile.entity';
 import { MedicineRequest } from 'src/medicine-request/entities/medicine-request.entity';
+import { Accident } from 'src/accident/entities/accident.entity';
 
 @Entity()
 export class User {
@@ -32,4 +33,7 @@ export class User {
 
   @OneToMany(() => MedicineRequest, (medicineRequest) => medicineRequest.parent)
   medicineRequests: MedicineRequest[];
+
+  @OneToMany(() => Accident, (accident) => accident.nurse)
+  accidents: Accident[];
 }

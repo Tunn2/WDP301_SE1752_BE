@@ -34,6 +34,6 @@ export class HealthProfile {
   @Column()
   note: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @Column({ type: 'timestamp' })
   date: Date;
 }
