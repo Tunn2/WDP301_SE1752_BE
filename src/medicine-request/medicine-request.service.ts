@@ -70,6 +70,7 @@ export class MedicineRequestService {
   async findByParent(parentId: string) {
     const medicineRequests = await this.medicineRequestRepo.find({
       where: { parent: { id: parentId } },
+      relations: ['parent', 'student'],
       order: { date: 'DESC' },
     });
     return medicineRequests.map((req) => ({
