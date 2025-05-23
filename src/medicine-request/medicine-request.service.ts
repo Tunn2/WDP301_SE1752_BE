@@ -66,4 +66,15 @@ export class MedicineRequestService {
       date: dayjs(req.date).tz('Asia/Bangkok').format('YYYY-MM-DD HH:mm:ss'),
     }));
   }
+
+  async findByParent(parentId: string) {
+    const medicineRequests = await this.medicineRequestRepo.find({
+      where: { parent: { id: parentId } },
+      order: { date: 'DESC' },
+    });
+    return medicineRequests.map((req) => ({
+      ...req,
+      date: dayjs(req.date).tz('Asia/Bangkok').format('YYYY-MM-DD HH:mm:ss'),
+    }));
+  }
 }

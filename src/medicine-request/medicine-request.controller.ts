@@ -73,4 +73,16 @@ export class MedicineRequestController {
       await this.medicineRequestService.getMedicineRequestToday(),
     );
   }
+
+  @Get('parent')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  async findByParentId(@Request() req) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Get medicine requests by parent id successfully',
+      await this.medicineRequestService.findByParent(req.user.userId),
+    );
+  }
 }
