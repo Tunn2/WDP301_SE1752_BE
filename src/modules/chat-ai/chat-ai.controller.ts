@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { ChatAiService } from './chat-ai.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { ResponseDTO } from 'src/common/response-dto/response.dto';
@@ -20,5 +27,17 @@ export class ChatAiController {
       request.content,
     );
     return new ResponseDTO(201, true, 'Successfully', output);
+  }
+
+  @Get()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  async getMessages(@Request() req) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Get messages successfully',
+      await this.chatAiService.findByUserId(req.user.userId),
+    );
   }
 }

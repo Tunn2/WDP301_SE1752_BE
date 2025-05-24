@@ -7,7 +7,10 @@ import OpenAI from 'openai';
 import { Message } from './entities/message.entity';
 import { Repository } from 'typeorm';
 import { User } from '../user/entities/user.entity';
-import { getCurrentTimeInBangkok } from 'src/common/utils/date.util';
+import {
+  formatToBangkokTime,
+  getCurrentTimeInBangkok,
+} from 'src/common/utils/date.util';
 
 @Injectable()
 export class ChatAiService {
@@ -32,6 +35,7 @@ export class ChatAiService {
   async askQuestion(userId: string, userInput: string): Promise<string> {
     const message1 = this.messageRepo.create({
       user: { id: userId },
+      from: 'user',
       content: userInput,
       date: getCurrentTimeInBangkok(),
     });
@@ -48,7 +52,6 @@ export class ChatAiService {
         ],
         max_tokens: 700, // ✅ Optional: giới hạn độ dài
       });
-      console.log(completion.choices[0].message);
       result = completion.choices[0].message.content || '';
     } catch (error) {
       console.error('OpenAI Error:', error);
@@ -57,12 +60,25 @@ export class ChatAiService {
     }
 
     const message2 = this.messageRepo.create({
+      user: { id: userId },
       content: result,
+      from: 'ai',
       date: getCurrentTimeInBangkok(),
     });
 
     await this.messageRepo.save(message2); // ✅ Lưu câu trả lời
 
     return result;
+  }
+
+  async findByUserId(userId: string) {
+    const messages = await this.messageRepo.find({
+      where: { user: { id: userId } },
+      order: { date: 'DESC' },
+    });
+    return messages.map((message) => ({
+      ...message,
+      date: formatToBangkokTime(message.date),
+    }));
   }
 }

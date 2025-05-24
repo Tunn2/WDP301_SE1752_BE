@@ -11,6 +11,9 @@ export class Message {
   @ManyToOne(() => User, (user) => user.messages, { nullable: true })
   user: User;
 
+  @Column()
+  from: string;
+
   @Column({
     type: 'timestamp',
   })
