@@ -1,25 +1,29 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserModule } from './user/user.module';
-import { StudentModule } from './student/student.module';
-import { User } from './user/entities/user.entity';
-import { HealthProfileModule } from './health-profile/health-profile.module';
-import { Student } from './student/entities/student.entity';
-import { ParentStudent } from './user/entities/parent-student.entity';
-import { HealthProfile } from './health-profile/entities/health-profile.entity';
-import { MedicineModule } from './medicine/medicine.module';
-import { Medicine } from './medicine/entities/medicine.entity';
-import { MedicineRequestModule } from './medicine-request/medicine-request.module';
+import { UserModule } from './modules/user/user.module';
+import { StudentModule } from './modules/student/student.module';
+import { User } from './modules/user/entities/user.entity';
+import { HealthProfileModule } from './modules/health-profile/health-profile.module';
+import { Student } from './modules/student/entities/student.entity';
+import { ParentStudent } from './modules/user/entities/parent-student.entity';
+import { HealthProfile } from './modules/health-profile/entities/health-profile.entity';
+import { MedicineRequestModule } from './modules/medicine-request/medicine-request.module';
 import { UploadModule } from './upload/upload.module';
-import { MedicineRequest } from './medicine-request/entities/medicine-request.entity';
-import { AccidentModule } from './accident/accident.module';
-import { Accident } from './accident/entities/accident.entity';
-import { AccidentMedicineModule } from './accident-medicine/accident-medicine.module';
-import { AccidentMedicine } from './accident-medicine/entities/accident-medicine.entity';
+import { MedicineRequest } from './modules/medicine-request/entities/medicine-request.entity';
+import { AccidentModule } from './modules/accident/accident.module';
+import { Accident } from './modules/accident/entities/accident.entity';
+import { AccidentMedicineModule } from './modules/accident-medicine/accident-medicine.module';
+import { AccidentMedicine } from './modules/accident-medicine/entities/accident-medicine.entity';
+import { SlotModule } from './modules/slot/slot.module';
+import { Slot } from './modules/slot/entities/slot.entity';
+import { Medicine } from './modules/medicine/entities/medicine.entity';
+import { MedicineModule } from './modules/medicine/medicine.module';
+import { ChatAiModule } from './modules/chat-ai/chat-ai.module';
+import { Message } from './modules/chat-ai/entities/message.entity';
 
 @Module({
   imports: [
@@ -46,6 +50,8 @@ import { AccidentMedicine } from './accident-medicine/entities/accident-medicine
           MedicineRequest,
           Accident,
           AccidentMedicine,
+          Slot,
+          Message,
         ],
         synchronize: true,
         logging: true,
@@ -60,6 +66,8 @@ import { AccidentMedicine } from './accident-medicine/entities/accident-medicine
     UploadModule,
     AccidentModule,
     AccidentMedicineModule,
+    SlotModule,
+    ChatAiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
