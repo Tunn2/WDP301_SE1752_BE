@@ -20,6 +20,8 @@ export class Accident {
   @Column()
   type: string;
 
+  @Column({ type: 'timestamp' })
+  date: Date;
   @ManyToOne(() => User, (nurse) => nurse.accidents)
   nurse: User;
 

@@ -5,6 +5,10 @@ import { Accident } from './entities/accident.entity';
 import { Repository } from 'typeorm';
 import { CreateAccidentDto } from './dto/create-accident.dto';
 import { Student } from 'src/modules/student/entities/student.entity';
+import {
+  formatToBangkokTime,
+  getCurrentTimeInBangkok,
+} from 'src/common/utils/date.util';
 
 @Injectable()
 export class AccidentService {
@@ -26,10 +30,22 @@ export class AccidentService {
       ...request,
       nurse: { id: nurseId },
       student: { id: student.id },
+      date: getCurrentTimeInBangkok(),
     });
 
     await this.accidentRepo.save(accident);
 
     return accident;
+  }
+
+  async findAll() {
+    const accidents = await this.accidentRepo.find({
+      order: { date: 'DESC' },
+      relations: ['accidentMedicines', 'student', 'nurse'],
+    });
+    return accidents.map((accident) => ({
+      ...accident,
+      date: formatToBangkokTime(accident.date),
+    }));
   }
 }
