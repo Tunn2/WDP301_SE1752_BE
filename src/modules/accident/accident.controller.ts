@@ -33,7 +33,7 @@ export class AccidentController {
   @Get()
   async findAll() {
     return new ResponseDTO(
-      201,
+      200,
       true,
       'Get accidents successfully',
       await this.accidentService.findAll(),

@@ -50,7 +50,8 @@ export class MedicineRequestService {
     if (!checkValid) {
       throw new BadRequestException('This user is not parent of this student');
     }
-    const uploadResult = await this.uploadService.uploadImage(file);
+    // const uploadResult = await this.uploadService.uploadImage(file);
+    const uploadResult = await this.uploadService.uploadImageToS3(file);
     const imageUrl = uploadResult.url;
     const medicineRequest = this.medicineRequestRepo.create({
       image: imageUrl,
