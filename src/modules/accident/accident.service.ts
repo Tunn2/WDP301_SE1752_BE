@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/await-thenable */
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Accident } from './entities/accident.entity';
 import { Repository } from 'typeorm';
@@ -47,5 +51,14 @@ export class AccidentService {
       ...accident,
       date: formatToBangkokTime(accident.date),
     }));
+  }
+
+  async findById(id: string) {
+    const accident = await this.accidentRepo.find({
+      where: { id },
+      relations: ['student', 'nurse', 'accidentMedicines'],
+    });
+    if (!accident) throw new NotFoundException('Accident not found');
+    return accident;
   }
 }

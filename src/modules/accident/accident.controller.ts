@@ -4,6 +4,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Request,
   UseGuards,
@@ -37,6 +38,16 @@ export class AccidentController {
       true,
       'Get accidents successfully',
       await this.accidentService.findAll(),
+    );
+  }
+
+  @Get(':id')
+  async findById(@Param('id') id: string) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Get accident by id successfully',
+      await this.accidentService.findById(id),
     );
   }
 }
