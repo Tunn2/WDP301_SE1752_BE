@@ -40,8 +40,8 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // cho phép truy cập từ bất cứ module nào
-      envFilePath: '.env', // đường dẫn file env (có thể bỏ nếu là mặc định)
+      isGlobal: true,
+      envFilePath: '.env',
     }),
     MailerModule.forRootAsync({
       imports: [ConfigModule],
@@ -92,7 +92,6 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
           StudentVaccination,
         ],
         synchronize: true,
-        // logging: true,
       }),
     }),
     AuthModule,

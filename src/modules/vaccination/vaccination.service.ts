@@ -46,7 +46,24 @@ export class VaccinationService {
         throw new BadRequestException(
           `Maximum doses is ${foundVaccination.numberOfDoses}`,
         );
-      await this.studentVaccinationRepo.save({ ...request });
+      const foundStudentVaccination = await this.studentVaccinationRepo.findOne(
+        {
+          where: {
+            student: { id: request.studentId },
+            vaccination: { id: request.vaccinationId },
+          },
+        },
+      );
+
+      if (foundStudentVaccination)
+        throw new BadRequestException(
+          'This student with this vaccination is already existed',
+        );
+      await this.studentVaccinationRepo.save({
+        student: { id: request.studentId },
+        vaccination: { id: request.vaccinationId },
+        doses: request.doses,
+      });
     } catch (error) {
       throw new BadRequestException(error);
     }

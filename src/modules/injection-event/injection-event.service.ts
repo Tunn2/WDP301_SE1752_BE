@@ -74,4 +74,10 @@ export class InjectionEventService {
     });
     return;
   }
+
+  async findByStudentId(studentId: string) {
+    const events = await this.studentVaccinationRepo.find({
+      where: { student: { id: studentId } },
+    });
+  }
 }
