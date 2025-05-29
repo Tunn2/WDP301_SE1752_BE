@@ -1,7 +1,9 @@
 import { Accident } from 'src/modules/accident/entities/accident.entity';
+import { HealthEventStudent } from 'src/modules/health-event/entities/health-event-student.entity';
 import { HealthProfile } from 'src/modules/health-profile/entities/health-profile.entity';
 import { MedicineRequest } from 'src/modules/medicine-request/entities/medicine-request.entity';
 import { ParentStudent } from 'src/modules/user/entities/parent-student.entity';
+import { StudentVaccination } from 'src/modules/vaccination/entities/student-vaccination.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -18,6 +20,9 @@ export class Student {
   @Column()
   address: string;
 
+  @Column()
+  gender: string;
+
   @OneToMany(() => ParentStudent, (studentUser) => studentUser.student)
   studentUsers: ParentStudent[];
 
@@ -32,4 +37,16 @@ export class Student {
 
   @OneToMany(() => Accident, (accident) => accident.student)
   accidents: Accident[];
+
+  @OneToMany(
+    () => HealthEventStudent,
+    (healthEventStudent) => healthEventStudent.student,
+  )
+  healthEventStudents: HealthEventStudent[];
+
+  @OneToMany(
+    () => StudentVaccination,
+    (studentVaccination) => studentVaccination.student,
+  )
+  studentVaccinations: StudentVaccination[];
 }

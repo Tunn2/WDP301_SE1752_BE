@@ -11,5 +11,6 @@ import { JwtStrategy } from 'src/modules/auth/strategies/jwt.strategy';
   imports: [TypeOrmModule.forFeature([HealthProfile, User, Student])],
   controllers: [HealthProfileController],
   providers: [HealthProfileService, JwtStrategy],
+  exports: [HealthProfileService],
 })
 export class HealthProfileModule {}

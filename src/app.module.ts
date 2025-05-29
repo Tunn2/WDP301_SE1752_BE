@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -24,12 +26,43 @@ import { Medicine } from './modules/medicine/entities/medicine.entity';
 import { MedicineModule } from './modules/medicine/medicine.module';
 import { ChatAiModule } from './modules/chat-ai/chat-ai.module';
 import { Message } from './modules/chat-ai/entities/message.entity';
+import { InjectionEventModule } from './modules/injection-event/injection-event.module';
+import { HealthEventModule } from './modules/health-event/health-event.module';
+import { HealthEvent } from './modules/health-event/entities/health-event.entity';
+import { HealthEventStudent } from './modules/health-event/entities/health-event-student.entity';
+import { InjectionEvent } from './modules/injection-event/entities/injection-event.entity';
+import { VaccinationModule } from './modules/vaccination/vaccination.module';
+import { Vaccination } from './modules/vaccination/entities/vaccine.entity';
+import { StudentVaccination } from './modules/vaccination/entities/student-vaccination.entity';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // cho phép truy cập từ bất cứ module nào
       envFilePath: '.env', // đường dẫn file env (có thể bỏ nếu là mặc định)
+    }),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          host: configService.get<string>('EMAIL_HOST'),
+          auth: {
+            user: configService.get<string>('EMAIL_USERNAME'),
+            pass: configService.get<string>('EMAIL_PASSWORD'),
+          },
+        },
+        defaults: { from: '"MedixCampus" <cr7@gmail.com>' },
+        template: {
+          dir: process.cwd() + '/src/modules/injection-event/templates',
+          adapter: new HandlebarsAdapter(),
+          options: {
+            strict: true,
+          },
+        },
+      }),
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -52,9 +85,14 @@ import { Message } from './modules/chat-ai/entities/message.entity';
           AccidentMedicine,
           Slot,
           Message,
+          HealthEvent,
+          HealthEventStudent,
+          InjectionEvent,
+          Vaccination,
+          StudentVaccination,
         ],
         synchronize: true,
-        logging: true,
+        // logging: true,
       }),
     }),
     AuthModule,
@@ -68,6 +106,9 @@ import { Message } from './modules/chat-ai/entities/message.entity';
     AccidentMedicineModule,
     SlotModule,
     ChatAiModule,
+    InjectionEventModule,
+    HealthEventModule,
+    VaccinationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

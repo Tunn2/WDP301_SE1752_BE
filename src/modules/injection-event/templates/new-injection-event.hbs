@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <meta charset='UTF-8' />
+    <title>New Injection Event</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <style>
+      /* Đặt style trong thẻ style để một số email client hỗ trợ tốt hơn */
+      body {
+        margin: 0;
+        padding: 0;
+        background: #f6f6f6;
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        max-width: 480px;
+        margin: 20px auto;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        padding: 24px 16px;
+      }
+      h1 {
+        font-size: 22px;
+        color: #2d7ff9;
+        margin-bottom: 12px;
+      }
+      p {
+        font-size: 16px;
+        color: #333;
+        margin: 8px 0;
+      }
+      @media only screen and (max-width: 600px) {
+        .container {
+          padding: 12px 4px;
+          margin-top: 10px;
+          margin-bottom: 10;
+        }
+        h1 {
+          font-size: 18px;
+        }
+        p {
+          font-size: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <h1>Sự kiện tiêm chủng mới</h1>
+      <p>Một sự kiện tiêm chủng mới đã được ghi nhận cho con bạn.</p>
+      <p><strong>Ngày:</strong> {{date}}</p>
+      <p><strong>Loại vắc xin:</strong> {{vaccination}}</p>
+    </div>
+  </body>
+</html>

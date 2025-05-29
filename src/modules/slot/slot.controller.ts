@@ -1,6 +1,10 @@
 import {
   Controller,
+  Get,
+  Param,
+  Patch,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -36,5 +40,26 @@ export class SlotController {
     }
     await this.slotService.importFromExcel(file.buffer);
     return new ResponseDTO(201, true, 'Import slot successfully', null);
+  }
+
+  @Get('today')
+  async findByStatus(
+    @Query('status') status: string,
+    @Query('session') session: string,
+  ) {
+    const parsedStatus = status == 'true';
+    // console.log(parsedStatus)
+    return new ResponseDTO(
+      200,
+      true,
+      'Get slots successfully',
+      await this.slotService.findToday(parsedStatus, session),
+    );
+  }
+
+  @Patch(':id/check')
+  async checkSlot(@Param('id') id: string) {
+    await this.slotService.checkSlot(id);
+    return new ResponseDTO(200, true, 'Check slot successfully', null);
   }
 }

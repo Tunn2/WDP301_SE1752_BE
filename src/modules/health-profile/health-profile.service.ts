@@ -50,4 +50,13 @@ export class HealthProfileService {
     }
     return healthProfile;
   }
+
+  async findLatestByStudentId(id: string) {
+    const healthProfile = await this.healthProfileRepo.findOne({
+      where: { student: { id } },
+      order: { date: 'DESC' },
+      relations: ['student'],
+    });
+    return healthProfile;
+  }
 }

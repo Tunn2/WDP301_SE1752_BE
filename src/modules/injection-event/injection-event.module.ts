@@ -1,0 +1,24 @@
+import { Module } from '@nestjs/common';
+import { InjectionEventService } from './injection-event.service';
+import { InjectionEventController } from './injection-event.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { InjectionEvent } from './entities/injection-event.entity';
+import { Student } from '../student/entities/student.entity';
+import { StudentVaccination } from '../vaccination/entities/student-vaccination.entity';
+import { Vaccination } from '../vaccination/entities/vaccine.entity';
+import { ParentStudent } from '../user/entities/parent-student.entity';
+
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([
+      InjectionEvent,
+      Student,
+      StudentVaccination,
+      Vaccination,
+      ParentStudent,
+    ]),
+  ],
+  controllers: [InjectionEventController],
+  providers: [InjectionEventService],
+})
+export class InjectionEventModule {}

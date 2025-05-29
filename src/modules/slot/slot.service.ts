@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Slot } from './entities/slot.entity';
 import { Between, Repository } from 'typeorm';
@@ -10,6 +14,10 @@ import { MedicineRequest } from 'src/modules/medicine-request/entities/medicine-
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import {
+  getEndOfTodayInBangkok,
+  getStartOfTodayInBangkok,
+} from 'src/common/utils/date.util';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 @Injectable()
@@ -60,5 +68,31 @@ export class SlotService {
         }
       }),
     );
+  }
+
+  async findToday(status: boolean, session: string) {
+    // console.log(status);
+    // console.log(session);
+    const slots = await this.slotRepo.find({
+      where: {
+        medicineRequest: {
+          date: Between(getStartOfTodayInBangkok(), getEndOfTodayInBangkok()),
+        },
+        status: status,
+        session,
+      },
+      relations: ['medicineRequest.student'],
+    });
+    return slots;
+  }
+
+  async checkSlot(id: string) {
+    const foundSlot = await this.slotRepo.findOne({ where: { id } });
+    if (!foundSlot) throw new NotFoundException('Slot not found');
+
+    if (foundSlot.status)
+      throw new BadRequestException('This slot has been already checked');
+    foundSlot.status = true;
+    await this.slotRepo.save(foundSlot);
   }
 }

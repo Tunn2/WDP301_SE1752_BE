@@ -1,6 +1,13 @@
+import { HealthEventStudent } from 'src/modules/health-event/entities/health-event-student.entity';
 import { Student } from 'src/modules/student/entities/student.entity';
 import { User } from 'src/modules/user/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class HealthProfile {
@@ -36,4 +43,10 @@ export class HealthProfile {
 
   @Column({ type: 'timestamp' })
   date: Date;
+
+  @OneToOne(
+    () => HealthEventStudent,
+    (healthEventStudent) => healthEventStudent.healthProfile,
+  )
+  healthEventStudent: HealthEventStudent;
 }
