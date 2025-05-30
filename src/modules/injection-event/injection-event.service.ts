@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
@@ -7,26 +8,27 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { InjectionEvent } from './entities/injection-event.entity';
 import { In, Repository } from 'typeorm';
 import { formatToBangkokTime } from 'src/common/utils/date.util';
-import { CreateInjectionEventDto } from './dto/create-health-event.dto';
-import { StudentVaccination } from '../vaccination/entities/student-vaccination.entity';
+import { CreateInjectionEventDto } from './dto/create-injection-event.dto';
 import { Vaccination } from '../vaccination/entities/vaccine.entity';
 import { Student } from '../student/entities/student.entity';
 import { ParentStudent } from '../user/entities/parent-student.entity';
 import { MailerService } from '@nestjs-modules/mailer';
+import { RegisterInjectionEvent } from './dto/register-injection-event.dto';
+import { StudentInjectionEvent } from '../student-injection/entities/student-injection-event.entity';
 
 @Injectable()
 export class InjectionEventService {
   constructor(
     @InjectRepository(InjectionEvent)
     private injectionEventRepo: Repository<InjectionEvent>,
-    @InjectRepository(StudentVaccination)
-    private studentVaccinationRepo: Repository<StudentVaccination>,
     @InjectRepository(Vaccination)
     private vaccinationRepo: Repository<Vaccination>,
     @InjectRepository(Student) private studentRepo: Repository<Student>,
     @InjectRepository(ParentStudent)
     private parentStudentRepo: Repository<ParentStudent>,
     private mailerService: MailerService,
+    @InjectRepository(StudentInjectionEvent)
+    private studentInjectionEventRepo: Repository<StudentInjectionEvent>,
   ) {}
   async create(request: CreateInjectionEventDto) {
     const foundVaccination = await this.vaccinationRepo.findOne({
@@ -75,9 +77,30 @@ export class InjectionEventService {
     return;
   }
 
-  async findByStudentId(studentId: string) {
-    const events = await this.studentVaccinationRepo.find({
-      where: { student: { id: studentId } },
+  async register(request: RegisterInjectionEvent) {
+    const foundInjectionEvent = await this.injectionEventRepo.findOne({
+      where: { id: request.injectionEventId },
     });
+
+    if (!foundInjectionEvent) {
+      throw new Error('Injection event not found');
+    }
+
+    const currentDate = new Date();
+    if (currentDate < foundInjectionEvent.registrationOpenDate) {
+      throw new Error('Registration has not yet opened');
+    }
+
+    if (currentDate > foundInjectionEvent.registrationCloseDate) {
+      throw new Error('Registration has already closed');
+    }
+
+    const foundStudentInjectionEvent =
+      await this.studentInjectionEventRepo.findOne({
+        where: {
+          student: { id: request.studentId },
+          injectionEvent: { id: request.injectionEventId },
+        },
+      });
   }
 }

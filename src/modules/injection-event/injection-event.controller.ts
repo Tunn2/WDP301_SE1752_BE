@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { InjectionEventService } from './injection-event.service';
-import { CreateInjectionEventDto } from './dto/create-health-event.dto';
+import { CreateInjectionEventDto } from './dto/create-injection-event.dto';
 import { ResponseDTO } from 'src/common/response-dto/response.dto';
 
 @Controller('injection-event')
