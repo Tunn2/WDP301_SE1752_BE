@@ -28,7 +28,6 @@ export class PaymentService {
       request.parentId,
       request.injectionEventId,
     );
-
     const accessKey = this.configService.get<string>('MOMO_ACCESS_KEY');
     const secretKey = this.configService.get<string>('MOMO_SECRET_KEY') || '';
     const orderInfo = 'Thanh toán cho tiêm chủng';
@@ -124,7 +123,7 @@ export class PaymentService {
     if (request.resultCode != 0) {
       transaction.status = TransactionStatus.CANCELLED;
     } else {
-      transaction.status = TransactionStatus.FINISHED;
+      transaction.status = TransactionStatus.PAID;
     }
 
     await this.transactionRepo.save(transaction);

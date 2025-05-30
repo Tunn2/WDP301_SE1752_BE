@@ -6,10 +6,17 @@ import { Transaction } from './entities/transaction.entity';
 import { User } from '../user/entities/user.entity';
 import { Student } from '../student/entities/student.entity';
 import { InjectionEvent } from '../injection-event/entities/injection-event.entity';
+import { StudentVaccination } from '../vaccination/entities/student-vaccination.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Transaction, User, Student, InjectionEvent]),
+    TypeOrmModule.forFeature([
+      Transaction,
+      User,
+      Student,
+      InjectionEvent,
+      StudentVaccination,
+    ]),
   ],
   controllers: [TransactionController],
   providers: [TransactionService],

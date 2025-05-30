@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Controller, Post, Body } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentRequest } from './dto/create-payment-request.dto';

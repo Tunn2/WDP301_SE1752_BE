@@ -6,6 +6,9 @@ import { InjectionEvent } from './entities/injection-event.entity';
 import { Student } from '../student/entities/student.entity';
 import { Vaccination } from '../vaccination/entities/vaccine.entity';
 import { ParentStudent } from '../user/entities/parent-student.entity';
+import { TransactionModule } from '../transaction/transaction.module';
+import { ExcelService } from '../excel/excel.service';
+import { Transaction } from '../transaction/entities/transaction.entity';
 
 @Module({
   imports: [
@@ -14,9 +17,11 @@ import { ParentStudent } from '../user/entities/parent-student.entity';
       Student,
       Vaccination,
       ParentStudent,
+      Transaction,
     ]),
+    TransactionModule,
   ],
   controllers: [InjectionEventController],
-  providers: [InjectionEventService],
+  providers: [InjectionEventService, ExcelService],
 })
 export class InjectionEventModule {}

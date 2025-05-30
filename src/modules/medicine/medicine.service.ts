@@ -23,7 +23,6 @@ export class MedicineService {
     const medicines = rows.map((row) => {
       const quantity =
         row['Số lượng hộp'] * row['Số lượng vỉ/hộp'] * row['Số lượng thuốc/vỉ'];
-      console.log(quantity);
       return {
         name: row['Tên'],
         manufacturer: row['Nhà sản xuất'],
@@ -32,7 +31,6 @@ export class MedicineService {
         quantity,
       };
     });
-    console.log(medicines);
 
     await this.medicineRepo.save(medicines);
     return 'Import medicines successfully';

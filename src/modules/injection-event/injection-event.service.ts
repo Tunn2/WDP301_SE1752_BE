@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -6,13 +7,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InjectionEvent } from './entities/injection-event.entity';
-import { In, Repository } from 'typeorm';
-import { formatToBangkokTime } from 'src/common/utils/date.util';
+import { In, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import {
+  formatToBangkokTime,
+  getCurrentTimeInBangkok,
+} from 'src/common/utils/date.util';
 import { CreateInjectionEventDto } from './dto/create-injection-event.dto';
 import { Vaccination } from '../vaccination/entities/vaccine.entity';
 import { Student } from '../student/entities/student.entity';
 import { ParentStudent } from '../user/entities/parent-student.entity';
 import { MailerService } from '@nestjs-modules/mailer';
+import { TransactionService } from '../transaction/transaction.service';
+import { ExcelService } from '../excel/excel.service';
+import * as XLSX from 'xlsx';
+import { Transaction } from '../transaction/entities/transaction.entity';
+import { TransactionStatus } from 'src/common/enums/transaction-status.enum';
 
 @Injectable()
 export class InjectionEventService {
@@ -24,7 +33,11 @@ export class InjectionEventService {
     @InjectRepository(Student) private studentRepo: Repository<Student>,
     @InjectRepository(ParentStudent)
     private parentStudentRepo: Repository<ParentStudent>,
+    @InjectRepository(Transaction)
+    private transactionRepo: Repository<Transaction>,
     private mailerService: MailerService,
+    private readonly transactionService: TransactionService,
+    private readonly excelService: ExcelService,
   ) {}
   async create(request: CreateInjectionEventDto) {
     const foundVaccination = await this.vaccinationRepo.findOne({
@@ -64,14 +77,68 @@ export class InjectionEventService {
     Array.from(emailSet).forEach((email) => {
       this.mailerService.sendMail({
         to: email,
-        subject: 'New Injection Event',
+        subject: 'Sụ kiện tiêm chủng',
         template: 'new-injection-event',
         context: {
           date: formatToBangkokTime(request.date),
           vaccination: foundVaccination.name,
+          registrationOpenDate: formatToBangkokTime(
+            request.registrationOpenDate,
+          ),
+          registrationCloseDate: formatToBangkokTime(
+            request.registrationCloseDate,
+          ),
         },
       });
     });
     return;
+  }
+
+  async findAvailableInjectionEvents() {
+    const injectionEvents = await this.injectionEventRepo.find({
+      where: {
+        registrationOpenDate: LessThanOrEqual(getCurrentTimeInBangkok()),
+        registrationCloseDate: MoreThanOrEqual(getCurrentTimeInBangkok()),
+      },
+    });
+    return injectionEvents.map((injectionEvent) => ({
+      ...injectionEvent,
+      registrationCloseDate: formatToBangkokTime(
+        injectionEvent.registrationCloseDate,
+      ),
+      registrationOpenDate: formatToBangkokTime(
+        injectionEvent.registrationOpenDate,
+      ),
+      date: formatToBangkokTime(injectionEvent.date),
+    }));
+  }
+
+  async findStudentRegisterdByInjectionEventId(injectionEventId: string) {
+    const data =
+      await this.transactionService.findStudentByInjectionEventId(
+        injectionEventId,
+      );
+    return this.excelService.exportToExcel(data);
+  }
+
+  async markAttendance(fileBuffer: Buffer) {
+    const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const rows = XLSX.utils.sheet_to_json(sheet) as Record<string, any>[];
+
+    for (const row of rows) {
+      const foundTransaction = await this.transactionRepo.findOne({
+        where: { student: { id: row['id'] } },
+      });
+      if (!foundTransaction)
+        throw new NotFoundException('Transaction not found');
+      if (row['Attendance'] == 'y') {
+        foundTransaction.status = TransactionStatus.FINISHED;
+      } else {
+        foundTransaction.status = TransactionStatus.NO_SHOW;
+      }
+      await this.transactionRepo.save(foundTransaction);
+    }
   }
 }
