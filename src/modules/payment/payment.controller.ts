@@ -13,7 +13,7 @@ export class PaymentController {
   @Post('momo/create')
   async createPayment(
     @Body('orderId') orderId: string = new Date().toISOString(),
-    @Body('amount') amount: number = 50000000,
+    @Body('amount') amount: number = 100000,
     @Res() res: Response,
   ) {
     try {
