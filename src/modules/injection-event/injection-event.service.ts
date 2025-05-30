@@ -13,8 +13,6 @@ import { Vaccination } from '../vaccination/entities/vaccine.entity';
 import { Student } from '../student/entities/student.entity';
 import { ParentStudent } from '../user/entities/parent-student.entity';
 import { MailerService } from '@nestjs-modules/mailer';
-import { RegisterInjectionEvent } from './dto/register-injection-event.dto';
-import { StudentInjectionEvent } from '../student-injection/entities/student-injection-event.entity';
 
 @Injectable()
 export class InjectionEventService {
@@ -27,8 +25,6 @@ export class InjectionEventService {
     @InjectRepository(ParentStudent)
     private parentStudentRepo: Repository<ParentStudent>,
     private mailerService: MailerService,
-    @InjectRepository(StudentInjectionEvent)
-    private studentInjectionEventRepo: Repository<StudentInjectionEvent>,
   ) {}
   async create(request: CreateInjectionEventDto) {
     const foundVaccination = await this.vaccinationRepo.findOne({
@@ -40,6 +36,9 @@ export class InjectionEventService {
     await this.injectionEventRepo.save({
       vaccination: foundVaccination,
       date: formatToBangkokTime(request.date),
+      registrationCloseDate: formatToBangkokTime(request.registrationCloseDate),
+      price: request.price,
+      registrationOpenDate: formatToBangkokTime(request.registrationOpenDate),
     });
 
     const studentsNotEnoughDoses = await this.studentRepo
@@ -49,9 +48,8 @@ export class InjectionEventService {
         requiredDoses: foundVaccination.numberOfDoses,
       })
       .orWhere('studentVaccination.id IS NULL')
-      .select('student.id', 'id') // Select only the `id` field and alias it as `id`
-      .getRawMany(); // Retrieve raw data
-
+      .select('student.id', 'id')
+      .getRawMany();
     const studentsJson = studentsNotEnoughDoses.map((record) => record.id);
 
     const parentStudents = await this.parentStudentRepo.find({
@@ -75,32 +73,5 @@ export class InjectionEventService {
       });
     });
     return;
-  }
-
-  async register(request: RegisterInjectionEvent) {
-    const foundInjectionEvent = await this.injectionEventRepo.findOne({
-      where: { id: request.injectionEventId },
-    });
-
-    if (!foundInjectionEvent) {
-      throw new Error('Injection event not found');
-    }
-
-    const currentDate = new Date();
-    if (currentDate < foundInjectionEvent.registrationOpenDate) {
-      throw new Error('Registration has not yet opened');
-    }
-
-    if (currentDate > foundInjectionEvent.registrationCloseDate) {
-      throw new Error('Registration has already closed');
-    }
-
-    const foundStudentInjectionEvent =
-      await this.studentInjectionEventRepo.findOne({
-        where: {
-          student: { id: request.studentId },
-          injectionEvent: { id: request.injectionEventId },
-        },
-      });
   }
 }

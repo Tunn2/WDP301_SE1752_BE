@@ -5,7 +5,7 @@ import { HealthProfile } from 'src/modules/health-profile/entities/health-profil
 import { MedicineRequest } from 'src/modules/medicine-request/entities/medicine-request.entity';
 import { Accident } from 'src/modules/accident/entities/accident.entity';
 import { Message } from 'src/modules/chat-ai/entities/message.entity';
-import { StudentInjectionEvent } from 'src/modules/student-injection/entities/student-injection-event.entity';
+import { Transaction } from 'src/modules/transaction/entities/transaction.entity';
 
 @Entity()
 export class User {
@@ -42,9 +42,6 @@ export class User {
   @OneToMany(() => Message, (message) => message.user)
   messages: Message[];
 
-  @OneToMany(
-    () => StudentInjectionEvent,
-    (studentInjectionEvent) => studentInjectionEvent.parent,
-  )
-  studentInjectionEvents: StudentInjectionEvent[];
+  @OneToMany(() => Transaction, (transaction) => transaction.parent)
+  transactions: Transaction[];
 }

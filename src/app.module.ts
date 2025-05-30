@@ -36,9 +36,9 @@ import { Vaccination } from './modules/vaccination/entities/vaccine.entity';
 import { StudentVaccination } from './modules/vaccination/entities/student-vaccination.entity';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { StudentInjectionModule } from './modules/student-injection/student-injection.module';
-import { StudentInjectionEvent } from './modules/student-injection/entities/student-injection-event.entity';
 import { PaymentModule } from './modules/payment/payment.module';
+import { TransactionModule } from './modules/transaction/transaction.module';
+import { Transaction } from './modules/transaction/entities/transaction.entity';
 
 @Module({
   imports: [
@@ -93,7 +93,7 @@ import { PaymentModule } from './modules/payment/payment.module';
           InjectionEvent,
           Vaccination,
           StudentVaccination,
-          StudentInjectionEvent,
+          Transaction,
         ],
         synchronize: true,
       }),
@@ -112,8 +112,8 @@ import { PaymentModule } from './modules/payment/payment.module';
     InjectionEventModule,
     HealthEventModule,
     VaccinationModule,
-    StudentInjectionModule,
     PaymentModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

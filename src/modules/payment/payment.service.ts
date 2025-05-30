@@ -1,28 +1,46 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 // src/payment/payment.service.ts
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
 import axios from 'axios';
+import { CreatePaymentRequest } from './dto/create-payment-request.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Transaction } from '../transaction/entities/transaction.entity';
+import { Repository } from 'typeorm';
+import { TransactionService } from '../transaction/transaction.service';
+import { TransactionStatus } from 'src/common/enums/transaction-status.enum';
 
 @Injectable()
 export class PaymentService {
-  constructor(private configService: ConfigService) {}
+  constructor(
+    private configService: ConfigService,
+    @InjectRepository(Transaction)
+    private transactionRepo: Repository<Transaction>,
+    private readonly transactionService: TransactionService,
+  ) {}
 
-  async createPayment(orderId: string, amount: number) {
-    // Hard-coded giá trị để test
+  async createPayment(request: CreatePaymentRequest) {
+    const transaction = await this.transactionService.create(
+      request.studentId,
+      request.parentId,
+      request.injectionEventId,
+    );
+
     const accessKey = this.configService.get<string>('MOMO_ACCESS_KEY');
     const secretKey = this.configService.get<string>('MOMO_SECRET_KEY') || '';
-    const orderInfo = 'pay with MoMo';
+    const orderInfo = 'Thanh toán cho tiêm chủng';
     const partnerCode = this.configService.get<string>('MOMO_PARTNER_CODE');
     const redirectUrl = this.configService.get<string>('MOMO_RETURN_URL');
-    const requestType = this.configService.get<string>('MOMO_REQUEST_TYPE'); // Loại yêu cầu thanh toán
+    const requestType = this.configService.get<string>('MOMO_REQUEST_TYPE');
     const ipnUrl = this.configService.get<string>('MOMO_IPN_URL');
-    const requestId = orderId;
-    const extraData = '';
+    const requestId = new Date().toISOString();
+    const extraData = transaction.id;
     const autoCapture = true;
+    const amount = transaction.injectionEvent.price;
     const lang = 'vi';
+    const orderId = new Date().toISOString();
     const rawSignature =
       'accessKey=' +
       accessKey +
@@ -54,8 +72,8 @@ export class PaymentService {
     // Tạo body cho request gửi đến MoMo
     const requestBody = JSON.stringify({
       partnerCode: partnerCode,
-      partnerName: 'Test',
-      storeId: 'MomoTestStore',
+      partnerName: 'MedixCampus',
+      storeId: 'siuuuu',
       requestId: requestId,
       amount: amount,
       orderId: orderId,
@@ -96,5 +114,22 @@ export class PaymentService {
         error: error.response?.data || error.message,
       };
     }
+  }
+
+  async finishPayment(request: any) {
+    const transaction = await this.transactionRepo.findOne({
+      where: { id: request.extraData },
+    });
+
+    if (!transaction) throw new NotFoundException('Transaction not found');
+
+    if (request.resultCode != 0) {
+      transaction.status = TransactionStatus.CANCELLED;
+    } else {
+      transaction.status = TransactionStatus.FINISHED;
+    }
+
+    await this.transactionRepo.save(transaction);
+    return request.resultCode == 0;
   }
 }

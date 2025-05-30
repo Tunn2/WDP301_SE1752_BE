@@ -1,11 +1,11 @@
-import { StudentInjectionEventStatus } from 'src/common/enums/student-injection-event.enum';
+import { TransactionStatus } from 'src/common/enums/transaction-status.enum';
 import { InjectionEvent } from 'src/modules/injection-event/entities/injection-event.entity';
 import { Student } from 'src/modules/student/entities/student.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class StudentInjectionEvent {
+export class Transaction {
   @PrimaryGeneratedColumn()
   id: string;
 
@@ -14,20 +14,20 @@ export class StudentInjectionEvent {
 
   @Column({
     type: 'enum',
-    enum: StudentInjectionEventStatus,
-    default: StudentInjectionEventStatus.PENDING,
+    enum: TransactionStatus,
+    default: TransactionStatus.PENDING,
   })
-  status: StudentInjectionEventStatus;
+  status: TransactionStatus;
 
-  @ManyToOne(() => Student, (student) => student.studentInjectionEvents)
+  @ManyToOne(() => Student, (student) => student.transactions)
   student: Student;
 
-  @ManyToOne(() => User, (user) => user.studentInjectionEvents)
+  @ManyToOne(() => User, (user) => user.transactions)
   parent: User;
 
   @ManyToOne(
     () => InjectionEvent,
-    (injectionEvent) => injectionEvent.studentInjectionEvents,
+    (injectionEvent) => injectionEvent.transactions,
   )
   injectionEvent: InjectionEvent;
 }

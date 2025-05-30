@@ -2,7 +2,7 @@ import { Accident } from 'src/modules/accident/entities/accident.entity';
 import { HealthEventStudent } from 'src/modules/health-event/entities/health-event-student.entity';
 import { HealthProfile } from 'src/modules/health-profile/entities/health-profile.entity';
 import { MedicineRequest } from 'src/modules/medicine-request/entities/medicine-request.entity';
-import { StudentInjectionEvent } from 'src/modules/student-injection/entities/student-injection-event.entity';
+import { Transaction } from 'src/modules/transaction/entities/transaction.entity';
 import { ParentStudent } from 'src/modules/user/entities/parent-student.entity';
 import { StudentVaccination } from 'src/modules/vaccination/entities/student-vaccination.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
@@ -51,9 +51,6 @@ export class Student {
   )
   studentVaccinations: StudentVaccination[];
 
-  @OneToMany(
-    () => StudentInjectionEvent,
-    (studentInjectionEvent) => studentInjectionEvent.student,
-  )
-  studentInjectionEvents: StudentInjectionEvent[];
+  @OneToMany(() => Transaction, (transaction) => transaction.student)
+  transactions: Transaction[];
 }

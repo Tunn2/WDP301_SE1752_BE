@@ -1,4 +1,4 @@
-export enum StudentInjectionEventStatus {
+export enum TransactionStatus {
   PENDING = 'pending',
   CANCELLED = 'cancelled',
   FINISHED = 'finished',

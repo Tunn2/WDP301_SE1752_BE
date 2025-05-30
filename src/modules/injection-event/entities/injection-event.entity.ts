@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Vaccination } from '../../vaccination/entities/vaccine.entity';
-import { StudentInjectionEvent } from 'src/modules/student-injection/entities/student-injection-event.entity';
+import { Transaction } from 'src/modules/transaction/entities/transaction.entity';
 
 @Entity()
 export class InjectionEvent {
@@ -28,9 +28,6 @@ export class InjectionEvent {
   @ManyToOne(() => Vaccination, (vaccination) => vaccination.injectionEvents)
   vaccination: Vaccination;
 
-  @OneToMany(
-    () => StudentInjectionEvent,
-    (studentInjectionEvent) => studentInjectionEvent.injectionEvent,
-  )
-  studentInjectionEvents: StudentInjectionEvent[];
+  @OneToMany(() => Transaction, (transaction) => transaction.injectionEvent)
+  transactions: Transaction[];
 }

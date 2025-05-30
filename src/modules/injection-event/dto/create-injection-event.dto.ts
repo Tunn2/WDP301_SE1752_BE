@@ -27,16 +27,13 @@ export class CreateInjectionEventDto {
   vaccinationId: string;
 
   @ApiProperty({ example: new Date() })
-  @IsDate()
   registrationOpenDate: Date;
 
   @ApiProperty({ example: new Date() })
-  @IsDate()
   @Validate(IsCloseDateValid)
   registrationCloseDate: Date;
 
   @ApiProperty({ example: new Date() })
-  @IsDate()
   date: Date;
 
   @IsNumber()
