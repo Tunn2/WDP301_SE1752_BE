@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 // src/payment/payment.service.ts
@@ -99,10 +100,7 @@ export class PaymentService {
       });
 
       // Trả về dữ liệu phản hồi từ MoMo (thường là URL để chuyển hướng đến trang thanh toán)
-      return {
-        success: true,
-        data: response.data,
-      };
+      return response.data.deeplink;
     } catch (error) {
       // Xử lý lỗi nếu có
       console.error(
