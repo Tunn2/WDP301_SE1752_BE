@@ -100,6 +100,7 @@ export class InjectionEventService {
         registrationOpenDate: LessThanOrEqual(getCurrentTimeInBangkok()),
         registrationCloseDate: MoreThanOrEqual(getCurrentTimeInBangkok()),
       },
+      relations: ['vaccination'],
     });
     return injectionEvents.map((injectionEvent) => ({
       ...injectionEvent,
