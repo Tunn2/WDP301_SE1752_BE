@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { VaccinationService } from './vaccination.service';
 import { ResponseDTO } from 'src/common/response-dto/response.dto';
 import { CreateVaccinationDto } from './dto/create-vaccination.dto';
@@ -32,6 +32,16 @@ export class VaccinationController {
       true,
       'Create student vaccination successfully',
       null,
+    );
+  }
+
+  @Get('student/:id')
+  async findByStudentId(@Param('id') studentId: string) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Successfully',
+      await this.vaccinationService.findByStudentId(studentId),
     );
   }
 }

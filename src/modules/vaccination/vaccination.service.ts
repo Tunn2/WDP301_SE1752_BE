@@ -68,4 +68,12 @@ export class VaccinationService {
       throw new BadRequestException(error);
     }
   }
+
+  async findByStudentId(studentId: string) {
+    const studentVaccinations = await this.studentVaccinationRepo.find({
+      where: { student: { id: studentId } },
+      relations: ['vaccination'],
+    });
+    return studentVaccinations;
+  }
 }

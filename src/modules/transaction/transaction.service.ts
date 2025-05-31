@@ -128,4 +128,30 @@ export class TransactionService {
       );
     return;
   }
+
+  async findRegisterSuccessfullyByStudentId(studentId: string) {
+    // const injectionEvents = await this.transactionRepoRepo.find();
+    const transactions = await this.transactionRepo.find({
+      where: {
+        student: { id: studentId },
+        status: In([
+          TransactionStatus.PAID,
+          TransactionStatus.FINISHED,
+          TransactionStatus.NO_SHOW,
+        ]),
+      },
+      relations: ['injectionEvent', 'injectionEvent.vaccination'],
+      order: { registrationDate: 'DESC' },
+    });
+    return transactions;
+  }
+
+  async findByParentId(parentId: string) {
+    const transactions = await this.transactionRepo.find({
+      where: { parent: { id: parentId } },
+      relations: ['injectionEvent', 'injectionEvent.vaccination'],
+      order: { registrationDate: 'DESC' },
+    });
+    return transactions;
+  }
 }

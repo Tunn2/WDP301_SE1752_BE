@@ -17,4 +17,26 @@ export class TransactionController {
       ),
     );
   }
+
+  @Get('register/:studentId')
+  async findRegisterSuccessfullyByStudentId(@Param('id') studentId: string) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Successfully',
+      await this.transactionService.findRegisterSuccessfullyByStudentId(
+        studentId,
+      ),
+    );
+  }
+
+  @Get('parent/:id')
+  async findByParentId(@Param('id') parentId: string) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Successfully',
+      await this.transactionService.findByParentId(parentId),
+    );
+  }
 }
