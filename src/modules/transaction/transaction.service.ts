@@ -76,7 +76,7 @@ export class TransactionService {
   async findInjectionEventHistoryByStudentId(studentId: string) {
     const injectionEvents = await this.transactionRepo.find({
       where: { student: { id: studentId }, status: TransactionStatus.FINISHED },
-      relations: ['injectionEvent'],
+      relations: ['injectionEvent', 'injectionEvent.vaccination'],
       order: { injectionEvent: { date: 'DESC' } },
     });
     return injectionEvents;
