@@ -23,6 +23,9 @@ export class InjectionEventController {
   constructor(private readonly injectionEventService: InjectionEventService) {}
 
   @Post()
+  @ApiOperation({
+    summary: 'Tạo sự kiện tiêm chủng tại trường',
+  })
   async create(@Body() request: CreateInjectionEventDto) {
     await this.injectionEventService.create(request);
     return new ResponseDTO(
@@ -34,6 +37,9 @@ export class InjectionEventController {
   }
 
   @Get('available')
+  @ApiOperation({
+    summary: 'Lấy những sự kiện tiêm chủng đang trong thời hạn có thể đăng kí',
+  })
   async findAvailable() {
     return new ResponseDTO(
       201,
@@ -44,6 +50,10 @@ export class InjectionEventController {
   }
 
   @Get(':id/students')
+  @ApiOperation({
+    summary:
+      'Danh sách học sinh đã đăng kí thành công của sự kiện đó, nhưng chưa tiêm',
+  })
   async findStudentRegisterByInjectionEventId(
     @Param('id') injectionEventId: string,
     @Res() res: Response,
@@ -66,7 +76,7 @@ export class InjectionEventController {
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
   @ApiOperation({
-    summary: 'Import danh sách tiêm',
+    summary: 'Import file kết quả sau khi tiêm',
   })
   @ApiBody({
     schema: {
