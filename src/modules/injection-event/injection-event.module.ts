@@ -9,6 +9,7 @@ import { ParentStudent } from '../user/entities/parent-student.entity';
 import { TransactionModule } from '../transaction/transaction.module';
 import { ExcelService } from '../excel/excel.service';
 import { Transaction } from '../transaction/entities/transaction.entity';
+import { StudentVaccination } from '../vaccination/entities/student-vaccination.entity';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { Transaction } from '../transaction/entities/transaction.entity';
       Vaccination,
       ParentStudent,
       Transaction,
+      StudentVaccination,
     ]),
     TransactionModule,
   ],

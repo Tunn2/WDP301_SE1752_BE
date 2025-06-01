@@ -19,7 +19,9 @@ export class TransactionController {
   }
 
   @Get('register/:studentId')
-  async findRegisterSuccessfullyByStudentId(@Param('id') studentId: string) {
+  async findRegisterSuccessfullyByStudentId(
+    @Param('studentId') studentId: string,
+  ) {
     return new ResponseDTO(
       200,
       true,

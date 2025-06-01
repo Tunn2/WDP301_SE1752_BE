@@ -22,6 +22,7 @@ import { ExcelService } from '../excel/excel.service';
 import * as XLSX from 'xlsx';
 import { Transaction } from '../transaction/entities/transaction.entity';
 import { TransactionStatus } from 'src/common/enums/transaction-status.enum';
+import { StudentVaccination } from '../vaccination/entities/student-vaccination.entity';
 
 @Injectable()
 export class InjectionEventService {
@@ -35,6 +36,8 @@ export class InjectionEventService {
     private parentStudentRepo: Repository<ParentStudent>,
     @InjectRepository(Transaction)
     private transactionRepo: Repository<Transaction>,
+    @InjectRepository(StudentVaccination)
+    private studentVaccinationRepo: Repository<StudentVaccination>,
     private mailerService: MailerService,
     private readonly transactionService: TransactionService,
     private readonly excelService: ExcelService,
@@ -131,11 +134,28 @@ export class InjectionEventService {
     for (const row of rows) {
       const foundTransaction = await this.transactionRepo.findOne({
         where: { student: { id: row['id'] } },
+        relations: ['student', 'injectionEvent', 'injectionEvent.vaccination'],
       });
       if (!foundTransaction)
         throw new NotFoundException('Transaction not found');
       if (row['Attendance'] == 'y') {
         foundTransaction.status = TransactionStatus.FINISHED;
+        const studentVaccination = await this.studentVaccinationRepo.findOne({
+          where: {
+            student: { id: foundTransaction.student.id },
+            vaccination: { id: foundTransaction.injectionEvent.vaccination.id },
+          },
+        });
+        if (!studentVaccination) {
+          await this.studentVaccinationRepo.save({
+            student: { id: foundTransaction.student.id },
+            doses: 1,
+            vaccination: { id: foundTransaction.injectionEvent.vaccination.id },
+          });
+        } else {
+          studentVaccination.doses += 1;
+          await this.studentVaccinationRepo.save(studentVaccination);
+        }
       } else {
         foundTransaction.status = TransactionStatus.NO_SHOW;
       }
