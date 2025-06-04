@@ -54,9 +54,9 @@ export class AccidentService {
   }
 
   async findById(id: string) {
-    const accident = await this.accidentRepo.find({
+    const accident = await this.accidentRepo.findOne({
       where: { id },
-      relations: ['student', 'nurse', 'accidentMedicines'],
+      relations: ['student', 'nurse', 'accidentMedicines.medicine'],
     });
     if (!accident) throw new NotFoundException('Accident not found');
     return accident;
