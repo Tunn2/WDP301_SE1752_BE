@@ -35,4 +35,8 @@ export class MedicineService {
     await this.medicineRepo.save(medicines);
     return 'Import medicines successfully';
   }
+
+  async getAllMedicines() {
+    return await this.medicineRepo.find();
+  }
 }

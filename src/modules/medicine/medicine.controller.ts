@@ -1,5 +1,6 @@
 import {
   Controller,
+  Get,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -36,5 +37,19 @@ export class MedicineController {
     }
     const message = await this.medicineService.importFromExcel(file.buffer);
     return new ResponseDTO(201, true, message, null);
+  }
+
+  @Get()
+  @ApiOperation({
+    summary: 'Lấy danh sách thuốc',
+  })
+  async getAllMedicines() {
+    const medicines = await this.medicineService.getAllMedicines();
+    return new ResponseDTO(
+      200,
+      true,
+      'Lấy danh sách thuốc thành công',
+      medicines,
+    );
   }
 }
