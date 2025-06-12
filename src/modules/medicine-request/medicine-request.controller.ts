@@ -5,6 +5,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Request,
   UploadedFile,
@@ -28,6 +29,28 @@ export class MedicineRequestController {
   constructor(
     private readonly medicineRequestService: MedicineRequestService,
   ) {}
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Lấy medicine request theo id' })
+  async findById(@Param('id') id: string) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Successfully',
+      await this.medicineRequestService.findById(id),
+    );
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Lấy tất cả medicine request' })
+  async findAll() {
+    return new ResponseDTO(
+      200,
+      true,
+      'Successfully',
+      await this.medicineRequestService.findAll(),
+    );
+  }
 
   @Post()
   @UseGuards(JwtAuthGuard)

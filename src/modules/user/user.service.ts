@@ -25,14 +25,11 @@ export class UserService {
     const pageNum = parseInt(page, 10) || 1;
     const limitNum = parseInt(limit, 10) || 10;
 
-    // Đảm bảo page và limit không âm
     const validPage = Math.max(1, pageNum);
     const validLimit = Math.max(1, Math.min(limitNum, 100)); // Giới hạn tối đa limit để tránh tải quá nhiều
 
-    // Tính số bản ghi cần bỏ qua (skip)
     const skip = (validPage - 1) * validLimit;
 
-    // Truy vấn với phân trang
     const [users, total] = await this.userRepo.findAndCount({
       skip,
       take: validLimit,
@@ -70,13 +67,14 @@ export class UserService {
       const studentCode = String(member['MSHS'] || '').trim();
       if (!studentCode) continue;
 
-      // Tìm hoặc tạo student
       let student = await this.studentRepo.findOne({ where: { studentCode } });
       if (!student) {
         student = this.studentRepo.create({
           studentCode,
           fullName: member['Họ tên'] || 'Không rõ',
           address: member['Địa chỉ'] || '',
+          class: member['Lớp'] || '',
+          gender: member['Giới tính'] || '',
         });
         await this.studentRepo.save(student);
       }
@@ -125,7 +123,6 @@ export class UserService {
           accountCount++;
         }
 
-        // Tạo quan hệ student-user nếu chưa có
         const existingRelation = await this.parentStudentRepo.findOne({
           where: {
             user: { id: user.id },

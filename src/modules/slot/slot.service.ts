@@ -18,6 +18,7 @@ import {
   getEndOfTodayInBangkok,
   getStartOfTodayInBangkok,
 } from 'src/common/utils/date.util';
+import { UploadService } from 'src/upload/upload.service';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 @Injectable()
@@ -27,6 +28,7 @@ export class SlotService {
     @InjectRepository(Student) private studentRepo: Repository<Student>,
     @InjectRepository(MedicineRequest)
     private medicineRequestRepo: Repository<MedicineRequest>,
+    private uploadService: UploadService,
   ) {}
 
   async importFromExcel(fileBuffer: Buffer) {
@@ -53,7 +55,6 @@ export class SlotService {
           throw new NotFoundException(
             `Medicine request not found for student: ${row['MSHS']}`,
           );
-
         for (const session of ['Sáng', 'Trưa', 'Chiều']) {
           if (row[session]) {
             const slot = this.slotRepo.create({
@@ -71,8 +72,6 @@ export class SlotService {
   }
 
   async findToday(status: boolean, session: string) {
-    // console.log(status);
-    // console.log(session);
     const slots = await this.slotRepo.find({
       where: {
         medicineRequest: {
@@ -86,13 +85,16 @@ export class SlotService {
     return slots;
   }
 
-  async checkSlot(id: string) {
+  async checkSlot(id: string, image: Express.Multer.File) {
     const foundSlot = await this.slotRepo.findOne({ where: { id } });
+    const uploadImage = await this.uploadService.uploadImageToS3(image);
+
     if (!foundSlot) throw new NotFoundException('Slot not found');
 
     if (foundSlot.status)
       throw new BadRequestException('This slot has been already checked');
     foundSlot.status = true;
+    foundSlot.image = uploadImage.url;
     await this.slotRepo.save(foundSlot);
   }
 }

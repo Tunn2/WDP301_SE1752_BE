@@ -23,6 +23,20 @@ export class MedicineRequestService {
     private uploadService: UploadService,
   ) {}
 
+  async findAll() {
+    return this.medicineRequestRepo.find({
+      relations: ['student', 'parent'],
+      order: { date: 'DESC' },
+    });
+  }
+
+  async findById(id: string) {
+    return this.medicineRequestRepo.findOne({
+      where: { id },
+      relations: ['student', 'parent', 'slots'],
+    });
+  }
+
   async create(
     file: Express.Multer.File,
     userId: string,

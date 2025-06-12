@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { SlotService } from './slot.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { ResponseDTO } from 'src/common/response-dto/response.dto';
 
 @Controller('slot')
@@ -43,23 +43,60 @@ export class SlotController {
   }
 
   @Get('today')
+  @ApiQuery({
+    name: 'status',
+    type: 'string',
+    required: false,
+    enum: ['true', 'false'],
+    description: 'Filter by status',
+    example: 'true',
+  })
+  @ApiQuery({
+    name: 'session',
+    type: 'string',
+    required: false,
+    enum: ['morning', 'afternoon', 'evening'],
+    description: 'Filter by session',
+    example: 'morning',
+  })
   async findByStatus(
-    @Query('status') status: string,
-    @Query('session') session: string,
+    @Query('status') status: boolean = false,
+    @Query('session') session: string = 'morning',
   ) {
-    const parsedStatus = status == 'true';
-    // console.log(parsedStatus)
     return new ResponseDTO(
       200,
       true,
       'Get slots successfully',
-      await this.slotService.findToday(parsedStatus, session),
+      await this.slotService.findToday(status, session),
     );
   }
 
+  //when check, client send slot id and an image, fix below code
   @Patch(':id/check')
-  async checkSlot(@Param('id') id: string) {
-    await this.slotService.checkSlot(id);
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({
+    summary: 'Check slot with image',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async checkSlot(
+    @UploadedFile() image: Express.Multer.File,
+    @Param('id') id: string,
+  ) {
+    if (!image) {
+      return new ResponseDTO(400, false, 'No image uploaded', null);
+    }
+    await this.slotService.checkSlot(id, image);
     return new ResponseDTO(200, true, 'Check slot successfully', null);
   }
 }

@@ -5,10 +5,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Slot } from './entities/slot.entity';
 import { Student } from 'src/modules/student/entities/student.entity';
 import { MedicineRequest } from 'src/modules/medicine-request/entities/medicine-request.entity';
+import { UploadModule } from 'src/upload/upload.module';
+import { S3Service } from '../s3/s3.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Slot, Student, MedicineRequest])],
+  imports: [
+    TypeOrmModule.forFeature([Slot, Student, MedicineRequest]),
+    UploadModule,
+  ],
   controllers: [SlotController],
-  providers: [SlotService],
+  providers: [SlotService, S3Service],
 })
 export class SlotModule {}
