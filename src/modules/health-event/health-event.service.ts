@@ -36,6 +36,16 @@ export class HealthEventService {
     });
   }
 
+  async findAll() {
+    const healthEvents = await this.healthEventRepo.find({
+      order: { date: 'DESC' },
+    });
+    return healthEvents.map((event) => ({
+      ...event,
+      date: formatToBangkokTime(event.date),
+    }));
+  }
+
   async importResultFromExcel(fileBuffer: Buffer, nurseId: string) {
     const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];

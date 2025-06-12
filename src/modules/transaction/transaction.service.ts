@@ -58,18 +58,15 @@ export class TransactionService {
       injectionEvent: foundInjectionEvent,
       registrationDate: getCurrentTimeInBangkok(),
     });
-
     transaction = await this.transactionRepo.save(transaction);
-
     const fullTransaction = await this.transactionRepo.findOne({
       where: { id: transaction.id },
-      relations: ['parent', 'student', 'injectionEvent'], // Load các quan hệ
+      relations: ['parent', 'student', 'injectionEvent'],
     });
 
     if (!fullTransaction) {
       throw new InternalServerErrorException('Failed to retrieve transaction');
     }
-
     return fullTransaction;
   }
 
@@ -130,7 +127,6 @@ export class TransactionService {
   }
 
   async findRegisterSuccessfullyByStudentId(studentId: string) {
-    // const injectionEvents = await this.transactionRepoRepo.find();
     const transactions = await this.transactionRepo.find({
       where: {
         student: { id: studentId },

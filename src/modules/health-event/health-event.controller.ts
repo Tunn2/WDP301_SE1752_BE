@@ -2,6 +2,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Request,
   UploadedFile,
@@ -26,13 +27,25 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 export class HealthEventController {
   constructor(private readonly healthEventService: HealthEventService) {}
 
+  @Get()
+  @ApiOperation({
+    summary: 'Get all health events',
+  })
+  async findAll() {
+    const healthEvents = await this.healthEventService.findAll();
+    return new ResponseDTO(
+      200,
+      true,
+      'Get health events successfully',
+      healthEvents,
+    );
+  }
+
   @Post()
   async create(@Body() request: CreateHealthEventDto) {
-    console.log('siu');
     if (typeof request.date === 'string') {
       request.date = new Date(request.date);
     }
-    console.log('siu1');
     await this.healthEventService.create(request);
     return new ResponseDTO(201, true, 'Create health event successfully', null);
   }

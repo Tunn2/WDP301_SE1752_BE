@@ -159,7 +159,42 @@ export class InjectionEventService {
       } else {
         foundTransaction.status = TransactionStatus.NO_SHOW;
       }
+      foundTransaction.condition = row['Condition'] || null;
       await this.transactionRepo.save(foundTransaction);
     }
+  }
+
+  async findStudentHaveInjectedByInjectionEventId(injectionEventId: string) {
+    const transactions = await this.transactionRepo.find({
+      where: {
+        injectionEvent: { id: injectionEventId },
+        status: TransactionStatus.FINISHED,
+      },
+      relations: ['student'],
+    });
+    const studentIds = transactions.map(
+      (transaction) => transaction.student.id,
+    );
+    const students = await this.studentRepo.find({
+      where: { id: In(studentIds) },
+    });
+    return students;
+  }
+
+  async findStudentNotInjectedByInjectionEventId(injectionEventId: string) {
+    const transactions = await this.transactionRepo.find({
+      where: {
+        injectionEvent: { id: injectionEventId },
+        status: In([TransactionStatus.PAID, TransactionStatus.NO_SHOW]),
+      },
+      relations: ['student'],
+    });
+    const studentIds = transactions.map(
+      (transaction) => transaction.student.id,
+    );
+    const students = await this.studentRepo.find({
+      where: { id: In(studentIds) },
+    });
+    return students;
   }
 }

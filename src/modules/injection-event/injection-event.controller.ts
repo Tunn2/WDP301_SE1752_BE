@@ -72,6 +72,40 @@ export class InjectionEventController {
     res.send(buffer);
   }
 
+  @Get(':id/students/injected')
+  @ApiOperation({
+    summary: 'Danh sách học sinh đã tiêm của sự kiện đó',
+  })
+  async findStudentHaveInjectedByInjectionEventId(
+    @Param('id') injectionEventId: string,
+  ) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Successfully',
+      await this.injectionEventService.findStudentHaveInjectedByInjectionEventId(
+        injectionEventId,
+      ),
+    );
+  }
+
+  @Get(':id/students/not-injected')
+  @ApiOperation({
+    summary: 'Danh sách học sinh không đến tiêm của sự kiện đó',
+  })
+  async findStudentNotInjectedByInjectionEventId(
+    @Param('id') injectionEventId: string,
+  ) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Successfully',
+      await this.injectionEventService.findStudentNotInjectedByInjectionEventId(
+        injectionEventId,
+      ),
+    );
+  }
+
   @Post(':id/attendance')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')

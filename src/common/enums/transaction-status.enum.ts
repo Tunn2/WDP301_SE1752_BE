@@ -6,3 +6,9 @@ export enum TransactionStatus {
   REFUNDED = 'refunded', // Hoàn tiền
   PAID = 'paid', // Đã thanh toán
 }
+
+export enum Condition {
+  HEALTHY = 'healthy', // Sức khỏe bình thường
+  ILL = 'ill', // Bị ốm
+  OTHER = 'other', // Khác
+}
