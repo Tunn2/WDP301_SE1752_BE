@@ -1,8 +1,9 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MedicineRequest } from './entities/medicine-request.entity';
-import { Between, Repository } from 'typeorm';
+import { Between, In, Repository } from 'typeorm';
 import { UploadService } from 'src/upload/upload.service';
 import { CreateMedicineRequestDto } from './dto/create-medicine-request.dto';
 import { ParentStudent } from 'src/modules/user/entities/parent-student.entity';
@@ -12,6 +13,7 @@ import {
   getEndOfTodayInBangkok,
   getStartOfTodayInBangkok,
 } from 'src/common/utils/date.util';
+import { Slot } from '../slot/entities/slot.entity';
 
 @Injectable()
 export class MedicineRequestService {
@@ -20,6 +22,8 @@ export class MedicineRequestService {
     private medicineRequestRepo: Repository<MedicineRequest>,
     @InjectRepository(ParentStudent)
     private parentStudentRepo: Repository<ParentStudent>,
+    @InjectRepository(Slot)
+    private slotRepo: Repository<Slot>,
     private uploadService: UploadService,
   ) {}
 
@@ -78,6 +82,7 @@ export class MedicineRequestService {
   }
 
   async getMedicineRequestToday() {
+    console.log('siuuuu');
     const medicineRequests = await this.medicineRequestRepo.find({
       where: {
         date: Between(getStartOfTodayInBangkok(), getEndOfTodayInBangkok()),
@@ -101,5 +106,92 @@ export class MedicineRequestService {
       ...req,
       date: formatToBangkokTime(req.date),
     }));
+  }
+
+  async getClassesToday() {
+    // Lấy tất cả medicine requests hôm nay
+    const medicineRequests = await this.medicineRequestRepo.find({
+      where: {
+        date: Between(getStartOfTodayInBangkok(), getEndOfTodayInBangkok()),
+      },
+      relations: ['student', 'slots', 'slots.nurse'],
+    });
+
+    if (medicineRequests.length === 0) {
+      throw new BadRequestException('No medicine requests found for today');
+    }
+
+    // Lọc ra những medicine requests chưa có nurse được assign
+    const unassignedMedicineRequests = medicineRequests.filter((req) => {
+      // Kiểm tra xem có slot nào chưa được assign nurse không
+      return req.slots.some((slot) => !slot.nurse || !slot.nurse.id);
+    });
+
+    if (unassignedMedicineRequests.length === 0) {
+      return []; // Hoặc throw exception nếu muốn
+    }
+
+    // Lấy danh sách các class chưa được assign
+    const unassignedClasses = unassignedMedicineRequests.map(
+      (req) => req.student.class,
+    );
+
+    // Loại bỏ duplicate classes
+    return [...new Set(unassignedClasses)];
+  }
+
+  async assignNurseToClass(classes: string[], nurseId: string) {
+    // Validation đầu vào
+    if (!classes || classes.length === 0) {
+      throw new BadRequestException('No classes provided');
+    }
+    if (!nurseId) {
+      throw new BadRequestException('Nurse ID is required');
+    }
+    const medicineRequests = await this.medicineRequestRepo.find({
+      where: {
+        date: Between(getStartOfTodayInBangkok(), getEndOfTodayInBangkok()),
+        student: { class: In(classes) },
+      },
+      relations: ['student', 'slots', 'slots.nurse'],
+    });
+
+    if (medicineRequests.length === 0) {
+      throw new BadRequestException(
+        'No medicine requests found for the provided classes today',
+      );
+    }
+    const unassignedSlots: Slot[] = [];
+    medicineRequests.forEach((req) => {
+      req.slots.forEach((slot) => {
+        if (!slot.nurse || !slot.nurse.id) {
+          unassignedSlots.push(slot);
+        }
+      });
+    });
+
+    if (unassignedSlots.length === 0) {
+      throw new BadRequestException(
+        'All slots for the provided classes are already assigned',
+      );
+    }
+
+    return await this.medicineRequestRepo.manager.transaction(
+      async (manager) => {
+        const slotRepo = manager.getRepository(Slot);
+        const updatePromises = unassignedSlots.map((slot) =>
+          slotRepo.save({
+            ...slot,
+            nurse: { id: nurseId },
+          }),
+        );
+        await Promise.all(updatePromises);
+        return {
+          message: `Successfully assigned nurse to ${unassignedSlots.length} slots across ${classes.length} classes`,
+          assignedSlots: unassignedSlots.length,
+          classes: classes,
+        };
+      },
+    );
   }
 }

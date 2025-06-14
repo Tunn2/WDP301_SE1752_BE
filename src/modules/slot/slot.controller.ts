@@ -55,13 +55,13 @@ export class SlotController {
     name: 'session',
     type: 'string',
     required: false,
-    enum: ['morning', 'afternoon', 'evening'],
+    enum: ['Sáng', 'Trưa', 'Tối'],
     description: 'Filter by session',
-    example: 'morning',
+    example: 'Sáng',
   })
   async findByStatus(
     @Query('status') status: boolean = false,
-    @Query('session') session: string = 'morning',
+    @Query('session') session: string = 'Sáng',
   ) {
     return new ResponseDTO(
       200,

@@ -23,23 +23,13 @@ import {
 } from '@nestjs/swagger';
 import { CreateMedicineRequestDto } from './dto/create-medicine-request.dto';
 import { ResponseDTO } from 'src/common/response-dto/response.dto';
+import { AssignNurseToClassDto } from './dto/assign-nurse-to-class.dto';
 
 @Controller('medicine-request')
 export class MedicineRequestController {
   constructor(
     private readonly medicineRequestService: MedicineRequestService,
   ) {}
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Lấy medicine request theo id' })
-  async findById(@Param('id') id: string) {
-    return new ResponseDTO(
-      200,
-      true,
-      'Successfully',
-      await this.medicineRequestService.findById(id),
-    );
-  }
 
   @Get()
   @ApiOperation({ summary: 'Lấy tất cả medicine request' })
@@ -49,6 +39,17 @@ export class MedicineRequestController {
       true,
       'Successfully',
       await this.medicineRequestService.findAll(),
+    );
+  }
+
+  @Get('class')
+  @ApiOperation({ summary: 'Lấy tất cả lớp có yêu cầu gửi thuốc hôm nay' })
+  async getClassesToday() {
+    return new ResponseDTO(
+      200,
+      true,
+      'Successfully',
+      await this.medicineRequestService.getClassesToday(),
     );
   }
 
@@ -89,6 +90,7 @@ export class MedicineRequestController {
 
   @Get('today')
   async findToday() {
+    console.log('Fetching medicine requests for today');
     return new ResponseDTO(
       200,
       true,
@@ -106,6 +108,30 @@ export class MedicineRequestController {
       true,
       'Get medicine requests by parent id successfully',
       await this.medicineRequestService.findByParent(req.user.userId),
+    );
+  }
+
+  @Post('assign')
+  async assignNurseToMedicineRequest(@Body() body: AssignNurseToClassDto) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Assign nurse to medicine request successfully',
+      await this.medicineRequestService.assignNurseToClass(
+        body.classes,
+        body.nurseId,
+      ),
+    );
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Lấy medicine request theo id' })
+  async findById(@Param('id') id: string) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Successfully',
+      await this.medicineRequestService.findById(id),
     );
   }
 }

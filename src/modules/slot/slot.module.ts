@@ -7,10 +7,11 @@ import { Student } from 'src/modules/student/entities/student.entity';
 import { MedicineRequest } from 'src/modules/medicine-request/entities/medicine-request.entity';
 import { UploadModule } from 'src/upload/upload.module';
 import { S3Service } from '../s3/s3.service';
+import { User } from '../user/entities/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Slot, Student, MedicineRequest]),
+    TypeOrmModule.forFeature([Slot, Student, MedicineRequest, User]),
     UploadModule,
   ],
   controllers: [SlotController],

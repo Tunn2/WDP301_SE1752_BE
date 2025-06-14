@@ -6,6 +6,7 @@ import { MedicineRequest } from 'src/modules/medicine-request/entities/medicine-
 import { Accident } from 'src/modules/accident/entities/accident.entity';
 import { Message } from 'src/modules/chat-ai/entities/message.entity';
 import { Transaction } from 'src/modules/transaction/entities/transaction.entity';
+import { Slot } from 'src/modules/slot/entities/slot.entity';
 
 @Entity()
 export class User {
@@ -44,4 +45,7 @@ export class User {
 
   @OneToMany(() => Transaction, (transaction) => transaction.parent)
   transactions: Transaction[];
+
+  @OneToMany(() => Slot, (slot) => slot.nurse)
+  slots: Slot[];
 }

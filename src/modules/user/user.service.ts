@@ -143,4 +143,10 @@ export class UserService {
 
     return `✅ Đã import thành công ${accountCount} tài khoản phụ huynh và ${relationCount} mối quan hệ học sinh - phụ huynh từ ${members.length} dòng dữ liệu.`;
   }
+
+  async findNurses() {
+    return this.userRepo.find({
+      where: { role: UserRole.NURSE },
+    });
+  }
 }

@@ -31,6 +31,16 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get('nurse')
+  async findNurses() {
+    return new ResponseDTO(
+      200,
+      true,
+      'Get nurses successfully',
+      await this.userService.findNurses(),
+    );
+  }
+
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin', 'manager')
