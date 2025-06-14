@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 import {
@@ -71,18 +72,32 @@ export class SlotService {
     );
   }
 
-  async findToday(status: boolean, session: string) {
+  async findToday(status: boolean, session: string, nurseId: string) {
     const slots = await this.slotRepo.find({
       where: {
         medicineRequest: {
           date: Between(getStartOfTodayInBangkok(), getEndOfTodayInBangkok()),
         },
+        nurse: { id: nurseId },
         status: status,
         session,
       },
       relations: ['medicineRequest.student'],
     });
-    return slots;
+
+    //after getting slots, arrange them by class
+    const arrangedSlots = slots.reduce(
+      (acc, slot) => {
+        const classroom = slot.medicineRequest.student.class;
+        if (!acc[classroom]) {
+          acc[classroom] = [];
+        }
+        acc[classroom].push(slot);
+        return acc;
+      },
+      {} as Record<string, Slot[]>,
+    );
+    return arrangedSlots;
   }
 
   async checkSlot(id: string, image: Express.Multer.File) {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Controller,
   Get,
@@ -5,13 +6,22 @@ import {
   Patch,
   Post,
   Query,
+  Request,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { SlotService } from './slot.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { ResponseDTO } from 'src/common/response-dto/response.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('slot')
 export class SlotController {
@@ -59,15 +69,18 @@ export class SlotController {
     description: 'Filter by session',
     example: 'Sáng',
   })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   async findByStatus(
     @Query('status') status: boolean = false,
     @Query('session') session: string = 'Sáng',
+    @Request() req,
   ) {
     return new ResponseDTO(
       200,
       true,
       'Get slots successfully',
-      await this.slotService.findToday(status, session),
+      await this.slotService.findToday(status, session, req.user.userId),
     );
   }
 
