@@ -54,14 +54,6 @@ export class SlotController {
 
   @Get('today')
   @ApiQuery({
-    name: 'status',
-    type: 'string',
-    required: false,
-    enum: ['true', 'false'],
-    description: 'Filter by status',
-    example: 'true',
-  })
-  @ApiQuery({
     name: 'session',
     type: 'string',
     required: false,
@@ -72,7 +64,6 @@ export class SlotController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   async findByStatus(
-    @Query('status') status: boolean = false,
     @Query('session') session: string = 'Sáng',
     @Request() req,
   ) {
@@ -80,7 +71,7 @@ export class SlotController {
       200,
       true,
       'Get slots successfully',
-      await this.slotService.findToday(status, session, req.user.userId),
+      await this.slotService.findToday(session, req.user.userId),
     );
   }
 

@@ -72,14 +72,13 @@ export class SlotService {
     );
   }
 
-  async findToday(status: boolean, session: string, nurseId: string) {
+  async findToday(session: string, nurseId: string) {
     const slots = await this.slotRepo.find({
       where: {
         medicineRequest: {
           date: Between(getStartOfTodayInBangkok(), getEndOfTodayInBangkok()),
         },
         nurse: { id: nurseId },
-        status: status,
         session,
       },
       relations: ['medicineRequest.student'],

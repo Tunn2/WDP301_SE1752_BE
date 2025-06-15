@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Query,
   Request,
@@ -19,7 +20,7 @@ export class HealthProfileController {
   constructor(private readonly healthProfileService: HealthProfileService) {}
 
   @Get('student/:id')
-  async findByStudentId(@Query('id') studentId: string) {
+  async findByStudentId(@Param('id') studentId: string) {
     return new ResponseDTO(
       200,
       true,
@@ -29,7 +30,7 @@ export class HealthProfileController {
   }
 
   @Get(':id')
-  async findById(@Query('id') id: string) {
+  async findById(@Param('id') id: string) {
     return new ResponseDTO(
       200,
       true,

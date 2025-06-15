@@ -33,7 +33,7 @@ export class HealthProfileService {
   }
 
   async findByStudentId(studentId: string) {
-    return await this.healthProfileRepo.find({
+    return await this.healthProfileRepo.findOne({
       where: { student: { id: studentId } },
       order: { date: 'DESC' },
       relations: ['user', 'student'],
