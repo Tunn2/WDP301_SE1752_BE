@@ -70,6 +70,7 @@ export class SlotController {
     @Query('session') session: string = 'Sáng',
     @Request() req,
   ) {
+    console.log('findByStatus: ', req.user);
     return new ResponseDTO(
       200,
       true,

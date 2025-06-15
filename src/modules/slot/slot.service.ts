@@ -96,6 +96,7 @@ export class SlotService {
       },
       {} as Record<string, Slot[]>,
     );
+    console.log(arrangedSlots);
     return arrangedSlots;
   }
 
