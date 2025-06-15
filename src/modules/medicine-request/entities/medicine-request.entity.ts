@@ -25,6 +25,9 @@ export class MedicineRequest {
   @Column()
   note: string;
 
+  @Column({ default: false })
+  isApproved: boolean;
+
   @ManyToOne(() => Student, (student) => student.medicinesRequests)
   student: Student;
 

@@ -41,6 +41,18 @@ export class MedicineRequestService {
     });
   }
 
+  async approveMedicineRequest(id: string) {
+    const medicineRequest = await this.medicineRequestRepo.findOne({
+      where: { id },
+    });
+
+    if (!medicineRequest) {
+      throw new BadRequestException('Medicine request not found');
+    }
+    medicineRequest.isApproved = true;
+    await this.medicineRequestRepo.save(medicineRequest);
+  }
+
   async create(
     file: Express.Multer.File,
     userId: string,

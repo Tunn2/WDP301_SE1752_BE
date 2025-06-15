@@ -6,6 +6,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Request,
   UploadedFile,
@@ -114,6 +115,17 @@ export class MedicineRequestController {
       true,
       'Get medicine requests by parent id successfully',
       await this.medicineRequestService.findByParent(req.user.userId),
+    );
+  }
+
+  @Patch(':id')
+  async aproveMedicineRequest(@Param('id') id: string) {
+    await this.medicineRequestService.approveMedicineRequest(id);
+    return new ResponseDTO(
+      200,
+      true,
+      'Medicine request approved successfully',
+      null,
     );
   }
 
