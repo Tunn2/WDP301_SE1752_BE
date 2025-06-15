@@ -113,7 +113,7 @@ export class MedicineRequestService {
     });
     return medicineRequests.map((req) => ({
       ...req,
-      date: formatToBangkokTime(req.date),
+      date: formatToVietnamTime(req.date),
     }));
   }
 
