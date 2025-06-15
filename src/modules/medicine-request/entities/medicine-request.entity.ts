@@ -1,3 +1,4 @@
+import { MedicineRequestStatus } from 'src/common/enums/medicine-request.enum';
 import { Slot } from 'src/modules/slot/entities/slot.entity';
 import { Student } from 'src/modules/student/entities/student.entity';
 import { User } from 'src/modules/user/entities/user.entity';
@@ -25,8 +26,12 @@ export class MedicineRequest {
   @Column()
   note: string;
 
-  @Column({ default: false })
-  isApproved: boolean;
+  @Column({
+    type: 'enum',
+    enum: MedicineRequestStatus,
+    default: MedicineRequestStatus.PENDING,
+  })
+  status: MedicineRequestStatus;
 
   @ManyToOne(() => Student, (student) => student.medicinesRequests)
   student: Student;

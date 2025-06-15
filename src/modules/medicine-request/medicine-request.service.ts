@@ -12,6 +12,7 @@ import {
   getStartOfTodayInVietnam,
 } from 'src/common/utils/date.util';
 import { Slot } from '../slot/entities/slot.entity';
+import { MedicineRequestStatus } from 'src/common/enums/medicine-request.enum';
 
 @Injectable()
 export class MedicineRequestService {
@@ -47,7 +48,18 @@ export class MedicineRequestService {
     if (!medicineRequest) {
       throw new BadRequestException('Medicine request not found');
     }
-    medicineRequest.isApproved = true;
+    medicineRequest.status = MedicineRequestStatus.APPROVED;
+    await this.medicineRequestRepo.save(medicineRequest);
+  }
+  async rejectMedicineRequest(id: string) {
+    const medicineRequest = await this.medicineRequestRepo.findOne({
+      where: { id },
+    });
+
+    if (!medicineRequest) {
+      throw new BadRequestException('Medicine request not found');
+    }
+    medicineRequest.status = MedicineRequestStatus.REJECTED;
     await this.medicineRequestRepo.save(medicineRequest);
   }
 
