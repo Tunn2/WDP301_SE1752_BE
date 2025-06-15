@@ -9,8 +9,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { InjectionEvent } from './entities/injection-event.entity';
 import { In, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import {
-  formatToBangkokTime,
-  getCurrentTimeInBangkok,
+  formatToVietnamTime,
+  getCurrentTimeInVietnam,
 } from 'src/common/utils/date.util';
 import { CreateInjectionEventDto } from './dto/create-injection-event.dto';
 import { Vaccination } from '../vaccination/entities/vaccine.entity';
@@ -51,10 +51,10 @@ export class InjectionEventService {
 
     await this.injectionEventRepo.save({
       vaccination: foundVaccination,
-      date: formatToBangkokTime(request.date),
-      registrationCloseDate: formatToBangkokTime(request.registrationCloseDate),
+      date: formatToVietnamTime(request.date),
+      registrationCloseDate: formatToVietnamTime(request.registrationCloseDate),
       price: request.price,
-      registrationOpenDate: formatToBangkokTime(request.registrationOpenDate),
+      registrationOpenDate: formatToVietnamTime(request.registrationOpenDate),
     });
 
     const studentsNotEnoughDoses = await this.studentRepo
@@ -83,12 +83,12 @@ export class InjectionEventService {
         subject: 'Sụ kiện tiêm chủng',
         template: 'new-injection-event',
         context: {
-          date: formatToBangkokTime(request.date),
+          date: formatToVietnamTime(request.date),
           vaccination: foundVaccination.name,
-          registrationOpenDate: formatToBangkokTime(
+          registrationOpenDate: formatToVietnamTime(
             request.registrationOpenDate,
           ),
-          registrationCloseDate: formatToBangkokTime(
+          registrationCloseDate: formatToVietnamTime(
             request.registrationCloseDate,
           ),
         },
@@ -100,20 +100,20 @@ export class InjectionEventService {
   async findAvailableInjectionEvents() {
     const injectionEvents = await this.injectionEventRepo.find({
       where: {
-        registrationOpenDate: LessThanOrEqual(getCurrentTimeInBangkok()),
-        registrationCloseDate: MoreThanOrEqual(getCurrentTimeInBangkok()),
+        registrationOpenDate: LessThanOrEqual(getCurrentTimeInVietnam()),
+        registrationCloseDate: MoreThanOrEqual(getCurrentTimeInVietnam()),
       },
       relations: ['vaccination'],
     });
     return injectionEvents.map((injectionEvent) => ({
       ...injectionEvent,
-      registrationCloseDate: formatToBangkokTime(
+      registrationCloseDate: formatToVietnamTime(
         injectionEvent.registrationCloseDate,
       ),
-      registrationOpenDate: formatToBangkokTime(
+      registrationOpenDate: formatToVietnamTime(
         injectionEvent.registrationOpenDate,
       ),
-      date: formatToBangkokTime(injectionEvent.date),
+      date: formatToVietnamTime(injectionEvent.date),
     }));
   }
 

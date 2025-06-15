@@ -37,8 +37,8 @@ export class SlotService {
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
     const rows = XLSX.utils.sheet_to_json(sheet) as Record<string, any>[];
-    const startOfToday = dayjs().tz('Asia/Bangkok').startOf('day').toDate();
-    const endOfToday = dayjs().tz('Asia/Bangkok').endOf('day').toDate();
+    const startOfToday = dayjs().tz('Asia/Ho_Chi_Minh').startOf('day').toDate();
+    const endOfToday = dayjs().tz('Asia/Ho_Chi_Minh').endOf('day').toDate();
     await Promise.all(
       rows.map(async (row) => {
         const student = await this.studentRepo.findOne({

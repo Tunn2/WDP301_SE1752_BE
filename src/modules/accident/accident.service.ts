@@ -10,8 +10,8 @@ import { Repository } from 'typeorm';
 import { CreateAccidentDto } from './dto/create-accident.dto';
 import { Student } from 'src/modules/student/entities/student.entity';
 import {
-  formatToBangkokTime,
-  getCurrentTimeInBangkok,
+  formatToVietnamTime,
+  getCurrentTimeInVietnam,
 } from 'src/common/utils/date.util';
 
 @Injectable()
@@ -34,7 +34,7 @@ export class AccidentService {
       ...request,
       nurse: { id: nurseId },
       student: { id: student.id },
-      date: getCurrentTimeInBangkok(),
+      date: getCurrentTimeInVietnam(),
     });
 
     await this.accidentRepo.save(accident);
@@ -49,7 +49,7 @@ export class AccidentService {
     });
     return accidents.map((accident) => ({
       ...accident,
-      date: formatToBangkokTime(accident.date),
+      date: formatToVietnamTime(accident.date),
     }));
   }
 
