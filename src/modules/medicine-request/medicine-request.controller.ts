@@ -4,6 +4,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -144,6 +145,20 @@ export class MedicineRequestController {
         body.classes,
         body.nurseId,
       ),
+    );
+  }
+
+  @Delete(':id')
+  @ApiOperation({
+    summary: 'Từ chối cầu gửi thuốc',
+  })
+  async deleteMedicineRequest(@Param('id') id: string) {
+    await this.medicineRequestService.rejectMedicineRequest(id);
+    return new ResponseDTO(
+      200,
+      true,
+      'Medicine request rejected successfully',
+      null,
     );
   }
 
