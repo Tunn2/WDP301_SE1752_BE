@@ -94,7 +94,6 @@ export class MedicineRequestService {
   }
 
   async getMedicineRequestToday() {
-    console.log('siuuuu');
     const medicineRequests = await this.medicineRequestRepo.find({
       where: {
         date: Between(getStartOfTodayInBangkok(), getEndOfTodayInBangkok()),

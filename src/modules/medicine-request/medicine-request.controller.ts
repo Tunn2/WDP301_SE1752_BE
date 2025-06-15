@@ -94,7 +94,6 @@ export class MedicineRequestController {
     summary: 'Xem những yêu cầu gửi thuốc hôm nay',
   })
   async findToday() {
-    console.log('Fetching medicine requests for today');
     return new ResponseDTO(
       200,
       true,
@@ -119,6 +118,9 @@ export class MedicineRequestController {
   }
 
   @Patch(':id')
+  @ApiOperation({
+    summary: 'Duyệt yêu cầu gửi thuốc',
+  })
   async aproveMedicineRequest(@Param('id') id: string) {
     await this.medicineRequestService.approveMedicineRequest(id);
     return new ResponseDTO(
