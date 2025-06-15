@@ -83,7 +83,9 @@ export class SlotService {
       },
       relations: ['medicineRequest.student'],
     });
-
+    console.log(0);
+    console.log(slots);
+    console.log('1');
     //after getting slots, arrange them by class
     const arrangedSlots = slots.reduce(
       (acc, slot) => {
@@ -97,6 +99,7 @@ export class SlotService {
       {} as Record<string, Slot[]>,
     );
     console.log(arrangedSlots);
+    console.log(2);
     return arrangedSlots;
   }
 
