@@ -10,7 +10,7 @@ import { In, Repository } from 'typeorm';
 import { Student } from '../student/entities/student.entity';
 import { InjectionEvent } from '../injection-event/entities/injection-event.entity';
 import { User } from '../user/entities/user.entity';
-import { getCurrentTimeInBangkok } from 'src/common/utils/date.util';
+import { getCurrentTimeInVietnam } from 'src/common/utils/date.util';
 import { TransactionStatus } from 'src/common/enums/transaction-status.enum';
 import { StudentVaccination } from '../vaccination/entities/student-vaccination.entity';
 
@@ -56,7 +56,7 @@ export class TransactionService {
       parent: foundParent,
       student: foundStudent,
       injectionEvent: foundInjectionEvent,
-      registrationDate: getCurrentTimeInBangkok(),
+      registrationDate: getCurrentTimeInVietnam(),
     });
     transaction = await this.transactionRepo.save(transaction);
     const fullTransaction = await this.transactionRepo.findOne({

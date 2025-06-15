@@ -77,7 +77,7 @@ import { Transaction } from './modules/transaction/entities/transaction.entity';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
-        logging: true,
+        // logging: true,
         entities: [
           User,
           Student,

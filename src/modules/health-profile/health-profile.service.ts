@@ -5,7 +5,7 @@ import { HealthProfile } from './entities/health-profile.entity';
 import { Repository } from 'typeorm';
 import { Student } from 'src/modules/student/entities/student.entity';
 
-import { getCurrentTimeInBangkok } from 'src/common/utils/date.util';
+import { getCurrentTimeInVietnam } from 'src/common/utils/date.util';
 
 @Injectable()
 export class HealthProfileService {
@@ -27,7 +27,7 @@ export class HealthProfileService {
       ...request,
       student,
       user: { id: userId },
-      date: getCurrentTimeInBangkok(),
+      date: getCurrentTimeInVietnam(),
     });
     await this.healthProfileRepo.save(newHealthProfile);
   }

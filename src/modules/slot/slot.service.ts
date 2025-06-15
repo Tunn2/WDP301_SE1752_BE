@@ -16,8 +16,8 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import {
-  getEndOfTodayInBangkok,
-  getStartOfTodayInBangkok,
+  getStartOfTodayInVietnam,
+  getEndOfTodayInVietnam,
 } from 'src/common/utils/date.util';
 import { UploadService } from 'src/upload/upload.service';
 dayjs.extend(utc);
@@ -76,7 +76,7 @@ export class SlotService {
     const slots = await this.slotRepo.find({
       where: {
         medicineRequest: {
-          date: Between(getStartOfTodayInBangkok(), getEndOfTodayInBangkok()),
+          date: Between(getStartOfTodayInVietnam(), getEndOfTodayInVietnam()),
         },
         nurse: { id: nurseId },
         session,

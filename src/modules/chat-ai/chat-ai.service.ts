@@ -8,8 +8,8 @@ import { Message } from './entities/message.entity';
 import { Repository } from 'typeorm';
 import { User } from '../user/entities/user.entity';
 import {
-  formatToBangkokTime,
-  getCurrentTimeInBangkok,
+  formatToVietnamTime,
+  getCurrentTimeInVietnam,
 } from 'src/common/utils/date.util';
 
 @Injectable()
@@ -37,7 +37,7 @@ export class ChatAiService {
       user: { id: userId },
       from: 'user',
       content: userInput,
-      date: getCurrentTimeInBangkok(),
+      date: getCurrentTimeInVietnam(),
     });
 
     await this.messageRepo.save(message1); // ✅ Lưu câu hỏi trước
@@ -63,7 +63,7 @@ export class ChatAiService {
       user: { id: userId },
       content: result,
       from: 'ai',
-      date: getCurrentTimeInBangkok(),
+      date: getCurrentTimeInVietnam(),
     });
 
     await this.messageRepo.save(message2); // ✅ Lưu câu trả lời
@@ -78,7 +78,7 @@ export class ChatAiService {
     });
     return messages.map((message) => ({
       ...message,
-      date: formatToBangkokTime(message.date),
+      date: formatToVietnamTime(message.date),
     }));
   }
 }

@@ -5,6 +5,8 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
+import { configureTimezone } from './configs/timezone.config';
+configureTimezone();
 
 declare const module: any;
 

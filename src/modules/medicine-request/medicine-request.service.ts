@@ -1,5 +1,3 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MedicineRequest } from './entities/medicine-request.entity';
@@ -8,10 +6,10 @@ import { UploadService } from 'src/upload/upload.service';
 import { CreateMedicineRequestDto } from './dto/create-medicine-request.dto';
 import { ParentStudent } from 'src/modules/user/entities/parent-student.entity';
 import {
-  formatToBangkokTime,
-  getCurrentTimeInBangkok,
-  getEndOfTodayInBangkok,
-  getStartOfTodayInBangkok,
+  formatToVietnamTime,
+  getCurrentTimeInVietnam,
+  getEndOfTodayInVietnam,
+  getStartOfTodayInVietnam,
 } from 'src/common/utils/date.util';
 import { Slot } from '../slot/entities/slot.entity';
 
@@ -61,7 +59,7 @@ export class MedicineRequestService {
     const foundMedicineRequest = await this.medicineRequestRepo.findOne({
       where: {
         student: { id: request.studentId },
-        date: Between(getStartOfTodayInBangkok(), getEndOfTodayInBangkok()),
+        date: Between(getStartOfTodayInVietnam(), getEndOfTodayInVietnam()),
       },
     });
 
@@ -88,7 +86,7 @@ export class MedicineRequestService {
       student: { id: request.studentId },
       parent: { id: userId },
       note: request.note,
-      date: getCurrentTimeInBangkok(),
+      date: getCurrentTimeInVietnam(),
     });
     await this.medicineRequestRepo.save(medicineRequest);
   }
@@ -96,14 +94,14 @@ export class MedicineRequestService {
   async getMedicineRequestToday() {
     const medicineRequests = await this.medicineRequestRepo.find({
       where: {
-        date: Between(getStartOfTodayInBangkok(), getEndOfTodayInBangkok()),
+        date: Between(getStartOfTodayInVietnam(), getEndOfTodayInVietnam()),
       },
       relations: ['student', 'parent'],
     });
 
     return medicineRequests.map((req) => ({
       ...req,
-      date: formatToBangkokTime(req.date),
+      date: formatToVietnamTime(req.date),
     }));
   }
 
@@ -123,7 +121,7 @@ export class MedicineRequestService {
     // Lấy tất cả medicine requests hôm nay
     const medicineRequests = await this.medicineRequestRepo.find({
       where: {
-        date: Between(getStartOfTodayInBangkok(), getEndOfTodayInBangkok()),
+        date: Between(getStartOfTodayInVietnam(), getEndOfTodayInVietnam()),
       },
       relations: ['student', 'slots', 'slots.nurse'],
     });
@@ -161,7 +159,7 @@ export class MedicineRequestService {
     }
     const medicineRequests = await this.medicineRequestRepo.find({
       where: {
-        date: Between(getStartOfTodayInBangkok(), getEndOfTodayInBangkok()),
+        date: Between(getStartOfTodayInVietnam(), getEndOfTodayInVietnam()),
         student: { class: In(classes) },
       },
       relations: ['student', 'slots', 'slots.nurse'],

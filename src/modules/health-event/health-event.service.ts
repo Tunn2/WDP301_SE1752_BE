@@ -8,8 +8,8 @@ import { HealthEvent } from './entities/health-event.entity';
 import { Repository } from 'typeorm';
 import { CreateHealthEventDto } from './dto/create-health-event.dto';
 import {
-  formatToBangkokTime,
-  getCurrentTimeInBangkok,
+  formatToVietnamTime,
+  getCurrentTimeInVietnam,
 } from 'src/common/utils/date.util';
 import * as XLSX from 'xlsx';
 import { Student } from '../student/entities/student.entity';
@@ -32,7 +32,7 @@ export class HealthEventService {
   async create(request: CreateHealthEventDto) {
     await this.healthEventRepo.save({
       ...request,
-      date: formatToBangkokTime(request.date),
+      date: formatToVietnamTime(request.date),
     });
   }
 
@@ -42,7 +42,7 @@ export class HealthEventService {
     });
     return healthEvents.map((event) => ({
       ...event,
-      date: formatToBangkokTime(event.date),
+      date: formatToVietnamTime(event.date),
     }));
   }
 
@@ -69,7 +69,7 @@ export class HealthEventService {
           note: latestHealthProfile?.note,
           student: latestHealthProfile?.student,
           user: { id: nurseId },
-          date: getCurrentTimeInBangkok(),
+          date: getCurrentTimeInVietnam(),
           weight: row['Cân nặng'],
           height: row['Chiều cao'],
           hearing: row['Thính lực'],
