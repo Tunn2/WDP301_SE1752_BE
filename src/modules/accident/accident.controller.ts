@@ -13,13 +13,16 @@ import { AccidentService } from './accident.service';
 import { CreateAccidentDto } from './dto/create-accident.dto';
 import { ResponseDTO } from 'src/common/response-dto/response.dto';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 @Controller('accident')
 export class AccidentController {
   constructor(private readonly accidentService: AccidentService) {}
 
   @Post()
+  @ApiOperation({
+    summary: 'Tạo sự cố cho học sinh',
+  })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   async create(@Request() req, @Body() createAccidentDto: CreateAccidentDto) {
@@ -32,6 +35,9 @@ export class AccidentController {
   }
 
   @Get()
+  @ApiOperation({
+    summary: 'Lấy tất cả sự cố',
+  })
   async findAll() {
     return new ResponseDTO(
       200,
@@ -42,6 +48,9 @@ export class AccidentController {
   }
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'Lấy sự cố theo id',
+  })
   async findById(@Param('id') id: string) {
     return new ResponseDTO(
       200,

@@ -63,6 +63,9 @@ export class SlotController {
   })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Nurse get slot được assign ngày hôm nay',
+  })
   async findByStatus(
     @Query('session') session: string = 'Sáng',
     @Request() req,

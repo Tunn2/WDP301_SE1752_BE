@@ -89,6 +89,9 @@ export class MedicineRequestController {
   }
 
   @Get('today')
+  @ApiOperation({
+    summary: 'Xem những yêu cầu gửi thuốc hôm nay',
+  })
   async findToday() {
     console.log('Fetching medicine requests for today');
     return new ResponseDTO(
@@ -100,6 +103,9 @@ export class MedicineRequestController {
   }
 
   @Get('parent')
+  @ApiOperation({
+    summary: 'Lấy tất cả medicine request của phụ huynh',
+  })
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   async findByParentId(@Request() req) {
@@ -112,6 +118,9 @@ export class MedicineRequestController {
   }
 
   @Post('assign')
+  @ApiOperation({
+    summary: 'Gán y tá cho lớp học trong yêu cầu gửi thuốc',
+  })
   async assignNurseToMedicineRequest(@Body() body: AssignNurseToClassDto) {
     return new ResponseDTO(
       200,
@@ -125,6 +134,9 @@ export class MedicineRequestController {
   }
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'Lấy medicine request theo id',
+  })
   @ApiOperation({ summary: 'Lấy medicine request theo id' })
   async findById(@Param('id') id: string) {
     return new ResponseDTO(

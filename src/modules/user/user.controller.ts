@@ -32,6 +32,9 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('nurse')
+  @ApiOperation({
+    summary: 'Lấy danh sách y tá',
+  })
   async findNurses() {
     return new ResponseDTO(
       200,
@@ -43,6 +46,9 @@ export class UserController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiOperation({
+    summary: 'Lấy danh sách tất cả người dùng',
+  })
   @Roles('admin', 'manager')
   @ApiBearerAuth('JWT-auth')
   @ApiQuery({
@@ -66,6 +72,9 @@ export class UserController {
   }
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'Lấy thông tin người dùng theo ID',
+  })
   async findOne(@Param('id') id: string) {
     return new ResponseDTO(
       200,

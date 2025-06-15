@@ -11,6 +11,9 @@ export class StudentController {
   constructor(private readonly studentService: StudentService) {}
 
   @Get()
+  @ApiOperation({
+    summary: 'Lấy danh sách học sinh',
+  })
   async findAll() {
     const students = await this.studentService.findAll();
     return new ResponseDTO(200, true, 'Get students successfully', students);

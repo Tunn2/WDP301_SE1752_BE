@@ -42,6 +42,9 @@ export class HealthEventController {
   }
 
   @Post()
+  @ApiOperation({
+    summary: 'Tạo sự kiện sức khỏe',
+  })
   async create(@Body() request: CreateHealthEventDto) {
     if (typeof request.date === 'string') {
       request.date = new Date(request.date);
