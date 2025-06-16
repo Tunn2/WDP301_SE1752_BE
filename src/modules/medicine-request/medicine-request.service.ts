@@ -95,7 +95,7 @@ export class MedicineRequestService {
   async findById(id: string) {
     return this.medicineRequestRepo.findOne({
       where: { id },
-      relations: ['student', 'parent', 'slots'],
+      relations: ['student', 'parent', 'slots', 'slots.medicines'],
     });
   }
 
