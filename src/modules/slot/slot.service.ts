@@ -81,7 +81,7 @@ export class SlotService {
         nurse: { id: nurseId },
         session,
       },
-      relations: ['medicineRequest.student'],
+      relations: ['medicineRequest.student', 'medicines'],
     });
     //after getting slots, arrange them by class
     const arrangedSlots = slots.reduce(
