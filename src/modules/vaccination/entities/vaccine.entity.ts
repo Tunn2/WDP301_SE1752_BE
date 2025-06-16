@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { InjectionEvent } from '../../injection-event/entities/injection-event.entity';
 import { StudentVaccination } from './student-vaccination.entity';
+import { VaccinationType } from 'src/common/enums/vaccination-type.enum';
 
 @Entity()
 export class Vaccination {
@@ -12,6 +13,9 @@ export class Vaccination {
 
   @Column()
   description: string;
+
+  @Column({ type: 'enum', enum: VaccinationType })
+  type: VaccinationType;
 
   @Column()
   numberOfDoses: number;

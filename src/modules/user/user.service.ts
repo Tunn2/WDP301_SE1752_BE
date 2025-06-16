@@ -75,6 +75,7 @@ export class UserService {
           address: member['Địa chỉ'] || '',
           class: member['Lớp'] || '',
           gender: member['Giới tính'] || '',
+          dob: member['Ngày sinh'] || '',
         });
         await this.studentRepo.save(student);
       }

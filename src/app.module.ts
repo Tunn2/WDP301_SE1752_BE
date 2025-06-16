@@ -39,6 +39,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { PaymentModule } from './modules/payment/payment.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { Transaction } from './modules/transaction/entities/transaction.entity';
+import { SlotMedicine } from './modules/slot/entities/slot-medicine.entity';
 
 @Module({
   imports: [
@@ -95,6 +96,7 @@ import { Transaction } from './modules/transaction/entities/transaction.entity';
           Vaccination,
           StudentVaccination,
           Transaction,
+          SlotMedicine,
         ],
         synchronize: true,
       }),

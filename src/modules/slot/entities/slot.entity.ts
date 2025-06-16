@@ -1,6 +1,13 @@
 import { MedicineRequest } from 'src/modules/medicine-request/entities/medicine-request.entity';
 import { User } from 'src/modules/user/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { SlotMedicine } from './slot-medicine.entity';
 
 @Entity()
 export class Slot {
@@ -10,14 +17,19 @@ export class Slot {
   @Column()
   session: string;
 
-  @Column()
+  @Column({ nullable: true })
   note: string;
 
   @Column({ default: false })
   status: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   image: string;
+
+  @OneToMany(() => SlotMedicine, (slotMedicine) => slotMedicine.slot, {
+    cascade: true,
+  })
+  medicines: SlotMedicine[];
 
   @ManyToOne(() => MedicineRequest, (medicineRequest) => medicineRequest.slots)
   medicineRequest: MedicineRequest;

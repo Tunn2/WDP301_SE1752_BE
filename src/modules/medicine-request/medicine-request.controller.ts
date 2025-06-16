@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -57,28 +58,13 @@ export class MedicineRequestController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('image'))
   @ApiOperation({ summary: 'Tạo yêu cầu gửi thuốc cho học sinh với hình ảnh' })
   @ApiBearerAuth('JWT-auth')
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        image: { type: 'string', format: 'binary' },
-        studentId: { type: 'string', description: 'ID của học sinh' },
-        note: { type: 'string', description: 'Ghi chú' },
-      },
-      required: ['image', 'studentId'],
-    },
-  })
   async create(
-    @UploadedFile() file: Express.Multer.File,
     @Body() createMedicineRequestDto: CreateMedicineRequestDto,
     @Request() req,
   ) {
     const medicineRequest = await this.medicineRequestService.create(
-      file,
       req.user.userId,
       createMedicineRequestDto,
     );
@@ -116,6 +102,30 @@ export class MedicineRequestController {
       'Get medicine requests by parent id successfully',
       await this.medicineRequestService.findByParent(req.user.userId),
     );
+  }
+
+  @Post('image')
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: { type: 'string', format: 'binary' },
+      },
+      required: ['image'],
+    },
+  })
+  @ApiOperation({
+    summary: 'Tạo yêu cầu gửi thuốc cho học sinh với hình ảnh',
+  })
+  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+    const { imageUrl, parsedResult } =
+      await this.medicineRequestService.uploadImageAndGetSlots(file);
+    return new ResponseDTO(201, true, 'Medicine request created successfully', {
+      imageUrl,
+      slots: parsedResult,
+    });
   }
 
   @Patch(':id')
