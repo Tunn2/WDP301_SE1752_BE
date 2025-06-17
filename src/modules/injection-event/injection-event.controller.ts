@@ -7,16 +7,20 @@ import {
   Get,
   Param,
   Post,
+  Request,
   Res,
-  UploadedFile,
-  UseInterceptors,
+  UseGuards,
+  // UploadedFile,
+  // UseInterceptors,
 } from '@nestjs/common';
 import { InjectionEventService } from './injection-event.service';
 import { CreateInjectionEventDto } from './dto/create-injection-event.dto';
 import { ResponseDTO } from 'src/common/response-dto/response.dto';
 import { Response } from 'express';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
+// import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RegisterInjectionEvent } from './dto/register-injection-event.dto';
 
 @Controller('injection-event')
 export class InjectionEventController {
@@ -49,6 +53,27 @@ export class InjectionEventController {
     );
   }
 
+  @Post('register')
+  @ApiOperation({
+    summary: 'Đăng kí sự kiện tiêm chủng',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  async registerInjectionEvent(
+    @Request() req,
+    @Body() registerDto: RegisterInjectionEvent,
+  ) {
+    return new ResponseDTO(
+      201,
+      true,
+      'Register successfully',
+      await this.injectionEventService.registerInjectionEvent(
+        req.user.userId,
+        registerDto.studentId,
+        registerDto.injectionEventId,
+      ),
+    );
+  }
   @Get(':id/students')
   @ApiOperation({
     summary:
@@ -72,62 +97,62 @@ export class InjectionEventController {
     res.send(buffer);
   }
 
-  @Get(':id/students/injected')
-  @ApiOperation({
-    summary: 'Danh sách học sinh đã tiêm của sự kiện đó',
-  })
-  async findStudentHaveInjectedByInjectionEventId(
-    @Param('id') injectionEventId: string,
-  ) {
-    return new ResponseDTO(
-      200,
-      true,
-      'Successfully',
-      await this.injectionEventService.findStudentHaveInjectedByInjectionEventId(
-        injectionEventId,
-      ),
-    );
-  }
+  // @Get(':id/students/injected')
+  // @ApiOperation({
+  //   summary: 'Danh sách học sinh đã tiêm của sự kiện đó',
+  // })
+  // async findStudentHaveInjectedByInjectionEventId(
+  //   @Param('id') injectionEventId: string,
+  // ) {
+  //   return new ResponseDTO(
+  //     200,
+  //     true,
+  //     'Successfully',
+  //     await this.injectionEventService.findStudentHaveInjectedByInjectionEventId(
+  //       injectionEventId,
+  //     ),
+  //   );
+  // }
 
-  @Get(':id/students/not-injected')
-  @ApiOperation({
-    summary: 'Danh sách học sinh không đến tiêm của sự kiện đó',
-  })
-  async findStudentNotInjectedByInjectionEventId(
-    @Param('id') injectionEventId: string,
-  ) {
-    return new ResponseDTO(
-      200,
-      true,
-      'Successfully',
-      await this.injectionEventService.findStudentNotInjectedByInjectionEventId(
-        injectionEventId,
-      ),
-    );
-  }
+  // @Get(':id/students/not-injected')
+  // @ApiOperation({
+  //   summary: 'Danh sách học sinh không đến tiêm của sự kiện đó',
+  // })
+  // async findStudentNotInjectedByInjectionEventId(
+  //   @Param('id') injectionEventId: string,
+  // ) {
+  //   return new ResponseDTO(
+  //     200,
+  //     true,
+  //     'Successfully',
+  //     await this.injectionEventService.findStudentNotInjectedByInjectionEventId(
+  //       injectionEventId,
+  //     ),
+  //   );
+  // }
 
-  @Post(':id/attendance')
-  @UseInterceptors(FileInterceptor('file'))
-  @ApiConsumes('multipart/form-data')
-  @ApiOperation({
-    summary: 'Import file kết quả sau khi tiêm',
-  })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  async markAttendance(@UploadedFile() file: Express.Multer.File) {
-    if (!file) {
-      return new ResponseDTO(400, false, 'Không có file được gửi lên', null);
-    }
-    await this.injectionEventService.markAttendance(file.buffer);
-    return new ResponseDTO(200, true, 'Điểm danh thành công', null);
-  }
+  // @Post(':id/attendance')
+  // @UseInterceptors(FileInterceptor('file'))
+  // @ApiConsumes('multipart/form-data')
+  // @ApiOperation({
+  //   summary: 'Import file kết quả sau khi tiêm',
+  // })
+  // @ApiBody({
+  //   schema: {
+  //     type: 'object',
+  //     properties: {
+  //       file: {
+  //         type: 'string',
+  //         format: 'binary',
+  //       },
+  //     },
+  //   },
+  // })
+  // async markAttendance(@UploadedFile() file: Express.Multer.File) {
+  //   if (!file) {
+  //     return new ResponseDTO(400, false, 'Không có file được gửi lên', null);
+  //   }
+  //   await this.injectionEventService.markAttendance(file.buffer);
+  //   return new ResponseDTO(200, true, 'Điểm danh thành công', null);
+  // }
 }

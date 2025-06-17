@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -12,6 +13,8 @@ import { Transaction } from '../transaction/entities/transaction.entity';
 import { Repository } from 'typeorm';
 import { TransactionService } from '../transaction/transaction.service';
 import { TransactionStatus } from 'src/common/enums/transaction-status.enum';
+import { InjectionRecord } from '../injection-record/entities/injection-record.entity';
+import { getCurrentTimeInVietnam } from 'src/common/utils/date.util';
 
 @Injectable()
 export class PaymentService {
@@ -19,6 +22,8 @@ export class PaymentService {
     private configService: ConfigService,
     @InjectRepository(Transaction)
     private transactionRepo: Repository<Transaction>,
+    @InjectRepository(InjectionRecord)
+    private injectionRecordRepo: Repository<InjectionRecord>,
     private readonly transactionService: TransactionService,
   ) {}
 
@@ -36,7 +41,7 @@ export class PaymentService {
     const requestType = this.configService.get<string>('MOMO_REQUEST_TYPE');
     const ipnUrl = this.configService.get<string>('MOMO_IPN_URL');
     const requestId = new Date().toISOString();
-    const extraData = transaction.id;
+    const extraData = `${transaction.id} ${request.studentId} ${request.injectionEventId}`;
     const autoCapture = true;
     const amount = transaction.injectionEvent.price;
     const lang = 'vi';
@@ -114,8 +119,9 @@ export class PaymentService {
   }
 
   async finishPayment(request: any) {
+    const extraData = request.extraData.split(' ');
     const transaction = await this.transactionRepo.findOne({
-      where: { id: request.extraData },
+      where: { id: extraData[0] },
     });
 
     if (!transaction) throw new NotFoundException('Transaction not found');
@@ -124,6 +130,12 @@ export class PaymentService {
       transaction.status = TransactionStatus.CANCELLED;
     } else {
       transaction.status = TransactionStatus.PAID;
+      const injectionRecord = this.injectionRecordRepo.create({
+        student: { id: extraData[1] },
+        injectionEvent: { id: extraData[2] },
+        registrationDate: getCurrentTimeInVietnam(),
+      });
+      await this.injectionRecordRepo.save(injectionRecord);
     }
 
     await this.transactionRepo.save(transaction);

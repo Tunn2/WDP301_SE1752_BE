@@ -10,6 +10,9 @@ import { TransactionModule } from '../transaction/transaction.module';
 import { ExcelService } from '../excel/excel.service';
 import { Transaction } from '../transaction/entities/transaction.entity';
 import { StudentVaccination } from '../vaccination/entities/student-vaccination.entity';
+import { InjectionRecord } from '../injection-record/entities/injection-record.entity';
+import { PaymentService } from '../payment/payment.service';
+import { PaymentModule } from '../payment/payment.module';
 
 @Module({
   imports: [
@@ -20,10 +23,12 @@ import { StudentVaccination } from '../vaccination/entities/student-vaccination.
       ParentStudent,
       Transaction,
       StudentVaccination,
+      InjectionRecord,
     ]),
     TransactionModule,
+    PaymentModule,
   ],
   controllers: [InjectionEventController],
-  providers: [InjectionEventService, ExcelService],
+  providers: [InjectionEventService, ExcelService, PaymentService],
 })
 export class InjectionEventModule {}

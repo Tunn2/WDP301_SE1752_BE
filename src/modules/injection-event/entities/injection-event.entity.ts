@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { Vaccination } from '../../vaccination/entities/vaccine.entity';
 import { Transaction } from 'src/modules/transaction/entities/transaction.entity';
+import { InjectionRecord } from 'src/modules/injection-record/entities/injection-record.entity';
 
 @Entity()
 export class InjectionEvent {
@@ -30,4 +31,10 @@ export class InjectionEvent {
 
   @OneToMany(() => Transaction, (transaction) => transaction.injectionEvent)
   transactions: Transaction[];
+
+  @OneToMany(
+    () => InjectionRecord,
+    (injectionRecord) => injectionRecord.injectionEvent,
+  )
+  injectionRecords: InjectionRecord;
 }

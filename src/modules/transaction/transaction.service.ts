@@ -72,7 +72,7 @@ export class TransactionService {
 
   async findInjectionEventHistoryByStudentId(studentId: string) {
     const injectionEvents = await this.transactionRepo.find({
-      where: { student: { id: studentId }, status: TransactionStatus.FINISHED },
+      where: { student: { id: studentId }, status: TransactionStatus.PAID },
       relations: ['injectionEvent', 'injectionEvent.vaccination'],
       order: { injectionEvent: { date: 'DESC' } },
     });
@@ -101,7 +101,7 @@ export class TransactionService {
       where: {
         student: { id: studentId },
         injectionEvent: { id: injectionEventId },
-        status: TransactionStatus.FINISHED,
+        status: TransactionStatus.PAID,
       },
     });
 
@@ -130,11 +130,7 @@ export class TransactionService {
     const transactions = await this.transactionRepo.find({
       where: {
         student: { id: studentId },
-        status: In([
-          TransactionStatus.PAID,
-          TransactionStatus.FINISHED,
-          TransactionStatus.NO_SHOW,
-        ]),
+        status: TransactionStatus.PAID,
       },
       relations: ['injectionEvent', 'injectionEvent.vaccination'],
       order: { registrationDate: 'DESC' },

@@ -57,7 +57,7 @@ export class SlotController {
     name: 'session',
     type: 'string',
     required: false,
-    enum: ['Sáng', 'Trưa', 'Tối'],
+    enum: ['Sáng', 'Trưa', 'Chiều'],
     description: 'Filter by session',
     example: 'Sáng',
   })

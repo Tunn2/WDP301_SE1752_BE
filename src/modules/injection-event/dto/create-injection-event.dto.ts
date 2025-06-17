@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNumber, IsString, Validate } from 'class-validator';
+import { IsNumber, IsString, Validate } from 'class-validator';
 import {
   ValidatorConstraint,
   ValidatorConstraintInterface,

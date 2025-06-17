@@ -40,6 +40,8 @@ import { PaymentModule } from './modules/payment/payment.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { Transaction } from './modules/transaction/entities/transaction.entity';
 import { SlotMedicine } from './modules/slot/entities/slot-medicine.entity';
+import { InjectionRecordModule } from './modules/injection-record/injection-record.module';
+import { InjectionRecord } from './modules/injection-record/entities/injection-record.entity';
 
 @Module({
   imports: [
@@ -97,6 +99,7 @@ import { SlotMedicine } from './modules/slot/entities/slot-medicine.entity';
           StudentVaccination,
           Transaction,
           SlotMedicine,
+          InjectionRecord,
         ],
         synchronize: true,
       }),
@@ -117,6 +120,7 @@ import { SlotMedicine } from './modules/slot/entities/slot-medicine.entity';
     VaccinationModule,
     PaymentModule,
     TransactionModule,
+    InjectionRecordModule,
   ],
   controllers: [AppController],
   providers: [AppService],

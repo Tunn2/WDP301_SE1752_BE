@@ -4,7 +4,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InjectionEvent } from './entities/injection-event.entity';
 import { In, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
@@ -23,6 +27,9 @@ import * as XLSX from 'xlsx';
 import { Transaction } from '../transaction/entities/transaction.entity';
 import { TransactionStatus } from 'src/common/enums/transaction-status.enum';
 import { StudentVaccination } from '../vaccination/entities/student-vaccination.entity';
+import { VaccinationType } from 'src/common/enums/vaccination-type.enum';
+import { InjectionRecord } from '../injection-record/entities/injection-record.entity';
+import { PaymentService } from '../payment/payment.service';
 
 @Injectable()
 export class InjectionEventService {
@@ -38,9 +45,12 @@ export class InjectionEventService {
     private transactionRepo: Repository<Transaction>,
     @InjectRepository(StudentVaccination)
     private studentVaccinationRepo: Repository<StudentVaccination>,
+    @InjectRepository(InjectionRecord)
+    private injectionRecordRepo: Repository<InjectionRecord>,
     private mailerService: MailerService,
     private readonly transactionService: TransactionService,
     private readonly excelService: ExcelService,
+    private readonly paymentService: PaymentService,
   ) {}
   async create(request: CreateInjectionEventDto) {
     const foundVaccination = await this.vaccinationRepo.findOne({
@@ -53,7 +63,7 @@ export class InjectionEventService {
       vaccination: foundVaccination,
       date: formatToVietnamTime(request.date),
       registrationCloseDate: formatToVietnamTime(request.registrationCloseDate),
-      price: request.price,
+      price: foundVaccination.type == VaccinationType.FREE ? 0 : request.price,
       registrationOpenDate: formatToVietnamTime(request.registrationOpenDate),
     });
 
@@ -125,76 +135,132 @@ export class InjectionEventService {
     return this.excelService.exportToExcel(data);
   }
 
-  async markAttendance(fileBuffer: Buffer) {
-    const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
-    const rows = XLSX.utils.sheet_to_json(sheet) as Record<string, any>[];
-
-    for (const row of rows) {
-      const foundTransaction = await this.transactionRepo.findOne({
-        where: { student: { id: row['id'] } },
-        relations: ['student', 'injectionEvent', 'injectionEvent.vaccination'],
+  async registerInjectionEvent(
+    parentId: string,
+    studentId: string,
+    injectionEventId: string,
+  ) {
+    try {
+      const foundParentStudent = await this.parentStudentRepo.findOne({
+        where: { student: { id: studentId }, user: { id: parentId } },
+        relations: ['student'],
       });
-      if (!foundTransaction)
-        throw new NotFoundException('Transaction not found');
-      if (row['Attendance'] == 'y') {
-        foundTransaction.status = TransactionStatus.FINISHED;
-        const studentVaccination = await this.studentVaccinationRepo.findOne({
-          where: {
-            student: { id: foundTransaction.student.id },
-            vaccination: { id: foundTransaction.injectionEvent.vaccination.id },
-          },
+
+      if (!foundParentStudent)
+        throw new BadRequestException('You cannot do this action');
+
+      const foundInjectionEvent = await this.injectionEventRepo.findOne({
+        where: { id: injectionEventId },
+        relations: ['vaccination'],
+      });
+
+      if (!foundInjectionEvent)
+        throw new BadRequestException('Injection event not found');
+
+      const foundInjectionRecord = await this.injectionRecordRepo.findOne({
+        where: {
+          student: { id: studentId },
+          injectionEvent: { id: foundInjectionEvent.id },
+        },
+      });
+
+      if (foundInjectionRecord)
+        throw new BadRequestException(
+          'This student have registered this injection event',
+        );
+
+      if (foundInjectionEvent.vaccination.type == VaccinationType.FREE) {
+        const injectionRecord = this.injectionRecordRepo.create({
+          injectionEvent: { id: foundInjectionEvent.id },
+          student: { id: studentId },
+          registrationDate: getCurrentTimeInVietnam(),
         });
-        if (!studentVaccination) {
-          await this.studentVaccinationRepo.save({
-            student: { id: foundTransaction.student.id },
-            doses: 1,
-            vaccination: { id: foundTransaction.injectionEvent.vaccination.id },
-          });
-        } else {
-          studentVaccination.doses += 1;
-          await this.studentVaccinationRepo.save(studentVaccination);
-        }
-      } else {
-        foundTransaction.status = TransactionStatus.NO_SHOW;
+        await this.injectionRecordRepo.save(injectionRecord);
+        return;
       }
-      foundTransaction.condition = row['Condition'] || null;
-      await this.transactionRepo.save(foundTransaction);
+      const paymentUrl = this.paymentService.createPayment({
+        studentId,
+        injectionEventId,
+        parentId,
+      });
+      return paymentUrl;
+    } catch (error) {
+      console.error(error.message);
+      throw new BadRequestException(error.message);
     }
   }
 
-  async findStudentHaveInjectedByInjectionEventId(injectionEventId: string) {
-    const transactions = await this.transactionRepo.find({
-      where: {
-        injectionEvent: { id: injectionEventId },
-        status: TransactionStatus.FINISHED,
-      },
-      relations: ['student'],
-    });
-    const studentIds = transactions.map(
-      (transaction) => transaction.student.id,
-    );
-    const students = await this.studentRepo.find({
-      where: { id: In(studentIds) },
-    });
-    return students;
-  }
+  // async markAttendance(fileBuffer: Buffer) {
+  //   const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
+  //   const sheetName = workbook.SheetNames[0];
+  //   const sheet = workbook.Sheets[sheetName];
+  //   const rows = XLSX.utils.sheet_to_json(sheet) as Record<string, any>[];
 
-  async findStudentNotInjectedByInjectionEventId(injectionEventId: string) {
-    const transactions = await this.transactionRepo.find({
-      where: {
-        injectionEvent: { id: injectionEventId },
-        status: In([TransactionStatus.PAID, TransactionStatus.NO_SHOW]),
-      },
-      relations: ['student'],
-    });
-    const studentIds = transactions.map(
-      (transaction) => transaction.student.id,
-    );
-    const students = await this.studentRepo.find({
-      where: { id: In(studentIds) },
-    });
-    return students;
-  }
+  //   for (const row of rows) {
+  //     const foundTransaction = await this.transactionRepo.findOne({
+  //       where: { student: { id: row['id'] } },
+  //       relations: ['student', 'injectionEvent', 'injectionEvent.vaccination'],
+  //     });
+  //     if (!foundTransaction)
+  //       throw new NotFoundException('Transaction not found');
+  //     if (row['Attendance'] == 'y') {
+  //       foundTransaction.status = TransactionStatus.FINISHED;
+  //       const studentVaccination = await this.studentVaccinationRepo.findOne({
+  //         where: {
+  //           student: { id: foundTransaction.student.id },
+  //           vaccination: { id: foundTransaction.injectionEvent.vaccination.id },
+  //         },
+  //       });
+  //       if (!studentVaccination) {
+  //         await this.studentVaccinationRepo.save({
+  //           student: { id: foundTransaction.student.id },
+  //           doses: 1,
+  //           vaccination: { id: foundTransaction.injectionEvent.vaccination.id },
+  //         });
+  //       } else {
+  //         studentVaccination.doses += 1;
+  //         await this.studentVaccinationRepo.save(studentVaccination);
+  //       }
+  //     } else {
+  //       foundTransaction.status = TransactionStatus.NO_SHOW;
+  //     }
+  //     foundTransaction.condition = row['Condition'] || null;
+  //     await this.transactionRepo.save(foundTransaction);
+  //   }
+  // }
+
+  // async findStudentHaveInjectedByInjectionEventId(injectionEventId: string) {
+  //   const transactions = await this.transactionRepo.find({
+  //     where: {
+  //       injectionEvent: { id: injectionEventId },
+  //       status: TransactionStatus.FINISHED,
+  //     },
+  //     relations: ['student'],
+  //   });
+  //   const studentIds = transactions.map(
+  //     (transaction) => transaction.student.id,
+  //   );
+  //   const students = await this.studentRepo.find({
+  //     where: { id: In(studentIds) },
+  //   });
+  //   return students;
+  // }
+
+  //từ từ xử lí sau
+  // async findStudentNotInjectedByInjectionEventId(injectionEventId: string) {
+  //   const transactions = await this.transactionRepo.find({
+  //     where: {
+  //       injectionEvent: { id: injectionEventId },
+  //       status: In([TransactionStatus.PAID, TransactionStatus.NO_SHOW]),
+  //     },
+  //     relations: ['student'],
+  //   });
+  //   const studentIds = transactions.map(
+  //     (transaction) => transaction.student.id,
+  //   );
+  //   const students = await this.studentRepo.find({
+  //     where: { id: In(studentIds) },
+  //   });
+  //   return students;
+  // }
 }

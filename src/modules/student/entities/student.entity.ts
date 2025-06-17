@@ -1,6 +1,7 @@
 import { Accident } from 'src/modules/accident/entities/accident.entity';
 import { HealthEventStudent } from 'src/modules/health-event/entities/health-event-student.entity';
 import { HealthProfile } from 'src/modules/health-profile/entities/health-profile.entity';
+import { InjectionRecord } from 'src/modules/injection-record/entities/injection-record.entity';
 import { MedicineRequest } from 'src/modules/medicine-request/entities/medicine-request.entity';
 import { Transaction } from 'src/modules/transaction/entities/transaction.entity';
 import { ParentStudent } from 'src/modules/user/entities/parent-student.entity';
@@ -59,4 +60,10 @@ export class Student {
 
   @OneToMany(() => Transaction, (transaction) => transaction.student)
   transactions: Transaction[];
+
+  @OneToMany(
+    () => InjectionRecord,
+    (injectionRecord) => injectionRecord.student,
+  )
+  injectionRecords: InjectionRecord;
 }
