@@ -42,6 +42,7 @@ import { Transaction } from './modules/transaction/entities/transaction.entity';
 import { SlotMedicine } from './modules/slot/entities/slot-medicine.entity';
 import { InjectionRecordModule } from './modules/injection-record/injection-record.module';
 import { InjectionRecord } from './modules/injection-record/entities/injection-record.entity';
+import { AppointmentModule } from './modules/appointment/appointment.module';
 
 @Module({
   imports: [
@@ -121,6 +122,7 @@ import { InjectionRecord } from './modules/injection-record/entities/injection-r
     PaymentModule,
     TransactionModule,
     InjectionRecordModule,
+    AppointmentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

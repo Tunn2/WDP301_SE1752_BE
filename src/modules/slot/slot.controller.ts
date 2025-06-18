@@ -4,7 +4,6 @@ import {
   Get,
   Param,
   Patch,
-  Post,
   Query,
   Request,
   UploadedFile,
@@ -27,30 +26,30 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 export class SlotController {
   constructor(private readonly slotService: SlotService) {}
 
-  @Post('import')
-  @UseInterceptors(FileInterceptor('file'))
-  @ApiConsumes('multipart/form-data')
-  @ApiOperation({
-    summary: 'Import slot từ file Excel',
-  })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  async importExcel(@UploadedFile() file: Express.Multer.File) {
-    if (!file) {
-      return new ResponseDTO(400, false, 'Không có file được gửi lên', null);
-    }
-    await this.slotService.importFromExcel(file.buffer);
-    return new ResponseDTO(201, true, 'Import slot successfully', null);
-  }
+  // @Post('import')
+  // @UseInterceptors(FileInterceptor('file'))
+  // @ApiConsumes('multipart/form-data')
+  // @ApiOperation({
+  //   summary: 'Import slot từ file Excel',
+  // })
+  // @ApiBody({
+  //   schema: {
+  //     type: 'object',
+  //     properties: {
+  //       file: {
+  //         type: 'string',
+  //         format: 'binary',
+  //       },
+  //     },
+  //   },
+  // })
+  // async importExcel(@UploadedFile() file: Express.Multer.File) {
+  //   if (!file) {
+  //     return new ResponseDTO(400, false, 'Không có file được gửi lên', null);
+  //   }
+  //   await this.slotService.importFromExcel(file.buffer);
+  //   return new ResponseDTO(201, true, 'Import slot successfully', null);
+  // }
 
   @Get('today')
   @ApiQuery({

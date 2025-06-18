@@ -9,7 +9,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Slot } from './entities/slot.entity';
 import { Between, Repository } from 'typeorm';
-import * as XLSX from 'xlsx';
+// import * as XLSX from 'xlsx';
 import { Student } from 'src/modules/student/entities/student.entity';
 import { MedicineRequest } from 'src/modules/medicine-request/entities/medicine-request.entity';
 import dayjs from 'dayjs';
@@ -32,45 +32,45 @@ export class SlotService {
     private uploadService: UploadService,
   ) {}
 
-  async importFromExcel(fileBuffer: Buffer) {
-    const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
-    const rows = XLSX.utils.sheet_to_json(sheet) as Record<string, any>[];
-    const startOfToday = dayjs().tz('Asia/Ho_Chi_Minh').startOf('day').toDate();
-    const endOfToday = dayjs().tz('Asia/Ho_Chi_Minh').endOf('day').toDate();
-    await Promise.all(
-      rows.map(async (row) => {
-        const student = await this.studentRepo.findOne({
-          where: { studentCode: row['MSHS'] },
-        });
+  // async importFromExcel(fileBuffer: Buffer) {
+  //   const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
+  //   const sheetName = workbook.SheetNames[0];
+  //   const sheet = workbook.Sheets[sheetName];
+  //   const rows = XLSX.utils.sheet_to_json(sheet) as Record<string, any>[];
+  //   const startOfToday = dayjs().tz('Asia/Ho_Chi_Minh').startOf('day').toDate();
+  //   const endOfToday = dayjs().tz('Asia/Ho_Chi_Minh').endOf('day').toDate();
+  //   await Promise.all(
+  //     rows.map(async (row) => {
+  //       const student = await this.studentRepo.findOne({
+  //         where: { studentCode: row['MSHS'] },
+  //       });
 
-        if (!student)
-          throw new NotFoundException(`Student not found: ${row['MSHS']}`);
+  //       if (!student)
+  //         throw new NotFoundException(`Student not found: ${row['MSHS']}`);
 
-        const medicineRequest = await this.medicineRequestRepo.findOne({
-          where: { student, date: Between(startOfToday, endOfToday) },
-        });
+  //       const medicineRequest = await this.medicineRequestRepo.findOne({
+  //         where: { student, date: Between(startOfToday, endOfToday) },
+  //       });
 
-        if (!medicineRequest)
-          throw new NotFoundException(
-            `Medicine request not found for student: ${row['MSHS']}`,
-          );
-        for (const session of ['Sáng', 'Trưa', 'Chiều']) {
-          if (row[session]) {
-            const slot = this.slotRepo.create({
-              medicineRequest,
-              note: row[session],
-              session,
-              status: false,
-              image: '',
-            });
-            await this.slotRepo.save(slot);
-          }
-        }
-      }),
-    );
-  }
+  //       if (!medicineRequest)
+  //         throw new NotFoundException(
+  //           `Medicine request not found for student: ${row['MSHS']}`,
+  //         );
+  //       for (const session of ['Sáng', 'Trưa', 'Chiều']) {
+  //         if (row[session]) {
+  //           const slot = this.slotRepo.create({
+  //             medicineRequest,
+  //             note: row[session],
+  //             session,
+  //             status: false,
+  //             image: '',
+  //           });
+  //           await this.slotRepo.save(slot);
+  //         }
+  //       }
+  //     }),
+  //   );
+  // }
 
   async findToday(session: string, nurseId: string) {
     const slots = await this.slotRepo.find({

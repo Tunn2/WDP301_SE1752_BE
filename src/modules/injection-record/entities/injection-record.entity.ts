@@ -49,13 +49,13 @@ export class InjectionRecord {
   @Column({ type: 'text', nullable: true })
   preInjectionHealthNotes: string;
 
-  @Column({ default: false })
+  @Column({ nullable: true })
   hasPreExistingConditions: boolean;
 
   @Column({ type: 'text', nullable: true })
   preExistingConditions: string;
 
-  @Column({ default: true })
+  @Column({ nullable: true })
   eligibleForInjection: boolean;
 
   @Column({ type: 'text', nullable: true })
