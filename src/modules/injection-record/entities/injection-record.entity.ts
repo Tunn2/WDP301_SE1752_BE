@@ -1,6 +1,13 @@
 import { InjectionEvent } from 'src/modules/injection-event/entities/injection-event.entity';
 import { Student } from 'src/modules/student/entities/student.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { PostInjectionReport } from '../../post-injection-report/entities/post-injection-report.entity';
 
 export enum InjectionStatus {
   SCHEDULED = 'scheduled',
@@ -80,4 +87,7 @@ export class InjectionRecord {
 
   @Column({ type: 'text', nullable: true })
   notes: string;
+
+  @OneToMany(() => PostInjectionReport, (report) => report.injectionRecord)
+  injectionReports: PostInjectionReport[];
 }

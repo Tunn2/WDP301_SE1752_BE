@@ -56,4 +56,15 @@ export class HealthProfileController {
       null,
     );
   }
+
+  @Get('student/:id/latest')
+  @ApiOperation({ summary: 'Lấy hồ sơ sức khỏe mới nhất' })
+  async findLatestByStudentId(@Param('id') studentId: string) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Successfully',
+      await this.healthProfileService.findLatestByStudentId(studentId),
+    );
+  }
 }

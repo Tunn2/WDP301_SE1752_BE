@@ -43,6 +43,9 @@ import { SlotMedicine } from './modules/slot/entities/slot-medicine.entity';
 import { InjectionRecordModule } from './modules/injection-record/injection-record.module';
 import { InjectionRecord } from './modules/injection-record/entities/injection-record.entity';
 import { AppointmentModule } from './modules/appointment/appointment.module';
+import { PostInjectionReportModule } from './modules/post-injection-report/post-injection-report.module';
+import { PostInjectionReport } from './modules/post-injection-report/entities/post-injection-report.entity';
+import { Appointment } from './modules/appointment/entities/appointment.entity';
 
 @Module({
   imports: [
@@ -101,6 +104,8 @@ import { AppointmentModule } from './modules/appointment/appointment.module';
           Transaction,
           SlotMedicine,
           InjectionRecord,
+          PostInjectionReport,
+          Appointment,
         ],
         synchronize: true,
       }),
@@ -123,6 +128,7 @@ import { AppointmentModule } from './modules/appointment/appointment.module';
     TransactionModule,
     InjectionRecordModule,
     AppointmentModule,
+    PostInjectionReportModule,
   ],
   controllers: [AppController],
   providers: [AppService],

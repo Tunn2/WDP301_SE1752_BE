@@ -34,8 +34,7 @@ export class InjectionRecordController {
 
   @Get(':id/students')
   @ApiOperation({
-    summary:
-      'Danh sách học sinh đã đăng kí thành công của sự kiện đó, nhưng chưa tiêm',
+    summary: 'Danh sách học sinh đã đăng kí thành công của sự kiện đó',
   })
   async findStudentRegisterByInjectionEventId(
     @Param('id') injectionEventId: string,
