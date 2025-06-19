@@ -1,5 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { AppointmentService } from './appointment.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { ResponseDTO } from 'src/common/response-dto/response.dto';
@@ -21,10 +29,38 @@ export class AppointmentController {
     @Request() req,
   ) {
     return new ResponseDTO(
-      200,
+      201,
       true,
       'Successful',
       await this.appointmentService.createAppointment(request, req.user.userId),
+    );
+  }
+
+  @Get()
+  @ApiOperation({
+    summary: 'Lấy tất cả lịch hẹn',
+  })
+  async findAll() {
+    return new ResponseDTO(
+      200,
+      true,
+      'Successful',
+      await this.appointmentService.findAll(),
+    );
+  }
+
+  @Get('user')
+  @ApiOperation({
+    summary: 'Lấy lịch hẹn theo người dùng',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  async findByUserId(@Request() req) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Successful',
+      await this.appointmentService.findByUserId(req.user.userId),
     );
   }
 }

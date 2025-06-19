@@ -4,7 +4,8 @@
 /build
 
 serviceAccountKey.json
-chromatic-music-447406-u8-ce0cb6bee8e0.json
+credentials.json
+token.json
 
 # Logs
 logs
