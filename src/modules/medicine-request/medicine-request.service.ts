@@ -226,6 +226,7 @@ export class MedicineRequestService {
       return finalMedicineRequest; // Trả về đối tượng đã lưu
     } catch (error) {
       console.log(error.message);
+      throw new BadRequestException(error.message);
     }
   }
 
