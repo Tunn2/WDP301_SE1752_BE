@@ -44,6 +44,19 @@ export class UserController {
     );
   }
 
+  @Get('parents')
+  @ApiOperation({
+    summary: 'Lấy danh sách phụ huynh',
+  })
+  async findParents() {
+    return new ResponseDTO(
+      200,
+      true,
+      'Get parents successfully',
+      await this.userService.findParents(),
+    );
+  }
+
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiOperation({

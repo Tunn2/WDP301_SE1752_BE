@@ -150,4 +150,10 @@ export class UserService {
       where: { role: UserRole.NURSE },
     });
   }
+
+  async findParents() {
+    return this.userRepo.find({
+      where: { role: UserRole.PARENT },
+    });
+  }
 }

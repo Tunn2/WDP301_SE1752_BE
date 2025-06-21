@@ -4,6 +4,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   Request,
   UseGuards,
@@ -61,6 +62,34 @@ export class AppointmentController {
       true,
       'Successful',
       await this.appointmentService.findByUserId(req.user.userId),
+    );
+  }
+
+  @Get('today')
+  @ApiOperation({
+    summary: 'Lấy lịch hẹn theo người dùng hôm nay',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  async findTodayByUserId(@Request() req) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Successful',
+      await this.appointmentService.findTodayByUserId(req.user.userId),
+    );
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    summary: 'Lấy lịch hẹn theo id',
+  })
+  async findById(@Param('id') id: string) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Successful',
+      await this.appointmentService.findById(id),
     );
   }
 }

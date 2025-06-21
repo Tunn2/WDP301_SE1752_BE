@@ -1,9 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { Appointment } from './entities/appointment.entity';
 import { GoogleMeetService } from '../google-meet/google-meet.service';
 import { User } from '../user/entities/user.entity';
@@ -11,7 +16,11 @@ import { UserRole } from 'src/common/enums/user-role.enum';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { getCurrentTimeInVietnam } from 'src/common/utils/date.util';
+import {
+  getCurrentTimeInVietnam,
+  getEndOfTodayInVietnam,
+  getStartOfTodayInVietnam,
+} from 'src/common/utils/date.util';
 
 dayjs.extend(customParseFormat);
 
@@ -62,6 +71,8 @@ export class AppointmentService {
         googleMeetLink: meetingData.data.meetingUri,
         createdAt: getCurrentTimeInVietnam(),
         updatedAt: getCurrentTimeInVietnam(),
+        nurse,
+        parent,
       });
 
       const savedAppointment = await this.appointmentRepo.save(appointment);
@@ -89,6 +100,41 @@ export class AppointmentService {
       });
     return await this.appointmentRepo.find({
       where: { parent: { id: userId } },
+      order: { appointmentTime: 'DESC' },
+    });
+  }
+
+  async findById(id: string) {
+    const foundAppoinment = await this.appointmentRepo.findOne({
+      where: { id },
+      relations: ['nurse'],
+    });
+    if (!foundAppoinment) throw new NotFoundException('Appointment not found');
+    return foundAppoinment;
+  }
+
+  async findTodayByUserId(userId: string) {
+    const foundUser = await this.userRepo.findOne({ where: { id: userId } });
+    if (!foundUser) throw new BadRequestException('User not found');
+    if (foundUser.role == UserRole.NURSE)
+      return this.appointmentRepo.find({
+        where: {
+          nurse: { id: userId },
+          appointmentTime: Between(
+            getStartOfTodayInVietnam(),
+            getEndOfTodayInVietnam(),
+          ),
+        },
+        order: { appointmentTime: 'DESC' },
+      });
+    return await this.appointmentRepo.find({
+      where: {
+        parent: { id: userId },
+        appointmentTime: Between(
+          getStartOfTodayInVietnam(),
+          getEndOfTodayInVietnam(),
+        ),
+      },
       order: { appointmentTime: 'DESC' },
     });
   }
