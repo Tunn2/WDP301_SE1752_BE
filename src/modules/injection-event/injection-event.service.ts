@@ -25,7 +25,6 @@ import { TransactionService } from '../transaction/transaction.service';
 import { ExcelService } from '../excel/excel.service';
 import * as XLSX from 'xlsx';
 import { Transaction } from '../transaction/entities/transaction.entity';
-import { TransactionStatus } from 'src/common/enums/transaction-status.enum';
 import { StudentVaccination } from '../vaccination/entities/student-vaccination.entity';
 import { VaccinationType } from 'src/common/enums/vaccination-type.enum';
 import { InjectionRecord } from '../injection-record/entities/injection-record.entity';

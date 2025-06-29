@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InjectionRecord } from './entities/injection-record.entity';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { Student } from '../student/entities/student.entity';
 import { ExcelService } from '../excel/excel.service';
 import * as XLSX from 'xlsx';
@@ -20,6 +20,7 @@ export class InjectionRecordService {
     private injectionRecordRepo: Repository<InjectionRecord>,
     @InjectRepository(Student) private studentRepo: Repository<Student>,
     private readonly excelService: ExcelService,
+    private dataSource: DataSource,
   ) {}
 
   async findAll() {
@@ -82,7 +83,9 @@ export class InjectionRecordService {
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
     const rows = XLSX.utils.sheet_to_json(sheet) as Record<string, any>[];
-
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     try {
       for (const row of rows) {
         const foundInjectionRecord = await this.injectionRecordRepo.findOne({
@@ -156,8 +159,10 @@ export class InjectionRecordService {
         await this.injectionRecordRepo.save(foundInjectionRecord);
         console.log(`Updated record for student: ${row['studentCode']}`);
       }
+      await queryRunner.commitTransaction();
     } catch (error) {
       console.error('Error updating injection records:', error);
+      await queryRunner.rollbackTransaction();
       throw new InternalServerErrorException(
         `Failed to update records: ${error.message}`,
       );

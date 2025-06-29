@@ -46,6 +46,7 @@ import { AppointmentModule } from './modules/appointment/appointment.module';
 import { PostInjectionReportModule } from './modules/post-injection-report/post-injection-report.module';
 import { PostInjectionReport } from './modules/post-injection-report/entities/post-injection-report.entity';
 import { Appointment } from './modules/appointment/entities/appointment.entity';
+import { RabbitmqModule } from './modules/rabbitmq/rabbitmq.module';
 
 @Module({
   imports: [
@@ -129,6 +130,7 @@ import { Appointment } from './modules/appointment/entities/appointment.entity';
     InjectionRecordModule,
     AppointmentModule,
     PostInjectionReportModule,
+    RabbitmqModule,
   ],
   controllers: [AppController],
   providers: [AppService],

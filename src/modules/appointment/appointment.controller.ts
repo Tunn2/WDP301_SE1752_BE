@@ -5,6 +5,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Request,
   UseGuards,
@@ -14,6 +15,7 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { ResponseDTO } from 'src/common/response-dto/response.dto';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ChangeAppointmentTimeDto } from './dto/change-appointment-time.dto';
 
 @Controller('appointment')
 export class AppointmentController {
@@ -90,6 +92,20 @@ export class AppointmentController {
       true,
       'Successful',
       await this.appointmentService.findById(id),
+    );
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Thay đổi lịch hẹn' })
+  async changeSchedule(
+    @Param('id') id: string,
+    request: ChangeAppointmentTimeDto,
+  ) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Successful',
+      await this.appointmentService.changeSchedule(id, request),
     );
   }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
@@ -21,6 +22,8 @@ import {
   getEndOfTodayInVietnam,
   getStartOfTodayInVietnam,
 } from 'src/common/utils/date.util';
+import { EmailProducerService } from '../email/email.service';
+import { ChangeAppointmentTimeDto } from './dto/change-appointment-time.dto';
 
 dayjs.extend(customParseFormat);
 
@@ -34,6 +37,7 @@ export class AppointmentService {
     @InjectRepository(User)
     private userRepo: Repository<User>,
     private googleMeetService: GoogleMeetService,
+    private emailService: EmailProducerService,
   ) {}
 
   async createAppointment(
@@ -73,6 +77,12 @@ export class AppointmentService {
         updatedAt: getCurrentTimeInVietnam(),
         nurse,
         parent,
+      });
+      this.emailService.sendAppointmentNoti({
+        email: parent.email,
+        name: parent.fullName,
+        appointmentTime: createAppointmentDto.appointmentTime.toString(),
+        userId: parent.id,
       });
 
       const savedAppointment = await this.appointmentRepo.save(appointment);
@@ -137,5 +147,25 @@ export class AppointmentService {
       },
       order: { appointmentTime: 'DESC' },
     });
+  }
+
+  async changeSchedule(id, request: ChangeAppointmentTimeDto) {
+    const foundAppointment = await this.appointmentRepo.findOne({
+      where: { id },
+    });
+    if (!foundAppointment) {
+      throw new NotFoundException('Appointment not found');
+    }
+    if (foundAppointment.appointmentTime < getCurrentTimeInVietnam()) {
+      throw new BadRequestException('Cannot change past appointment');
+    }
+    if (
+      foundAppointment.appointmentTime.getTime() ===
+      request.newAppointmentTime.getTime()
+    ) {
+      throw new BadRequestException('New appointment time must be different');
+    }
+    foundAppointment.appointmentTime = request.newAppointmentTime;
+    await this.appointmentRepo.save(foundAppointment);
   }
 }
