@@ -30,7 +30,7 @@ export class HealthProfile {
   bloodType: string;
 
   @Column()
-  allergies: string;
+  allergies?: string;
 
   @Column()
   hearing: number;

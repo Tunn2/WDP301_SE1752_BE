@@ -62,19 +62,34 @@ export class HealthEventService {
 
         const latestHealthProfile =
           await this.healthProfileService.findLatestByStudentId(student.id);
-
-        const newHealthProfile = this.healthProfileRepo.create({
-          allergies: latestHealthProfile?.allergies,
-          bloodType: latestHealthProfile?.bloodType,
-          note: latestHealthProfile?.note,
-          student: latestHealthProfile?.student,
-          user: { id: nurseId },
-          date: getCurrentTimeInVietnam(),
-          weight: row['Cân nặng'],
-          height: row['Chiều cao'],
-          hearing: row['Thính lực'],
-          vision: row['Thị lực'],
-        });
+        let newHealthProfile: HealthProfile | null = null;
+        if (latestHealthProfile == null) {
+          newHealthProfile = this.healthProfileRepo.create({
+            allergies: '',
+            bloodType: '',
+            note: '',
+            student,
+            user: { id: nurseId },
+            date: getCurrentTimeInVietnam(),
+            weight: row['Cân nặng'],
+            height: row['Chiều cao'],
+            hearing: row['Thính lực'],
+            vision: row['Thị lực'],
+          });
+        } else {
+          newHealthProfile = this.healthProfileRepo.create({
+            allergies: latestHealthProfile?.allergies,
+            bloodType: latestHealthProfile?.bloodType,
+            note: latestHealthProfile?.note,
+            student: latestHealthProfile?.student,
+            user: { id: nurseId },
+            date: getCurrentTimeInVietnam(),
+            weight: row['Cân nặng'],
+            height: row['Chiều cao'],
+            hearing: row['Thính lực'],
+            vision: row['Thị lực'],
+          });
+        }
         await this.healthProfileRepo.save(newHealthProfile);
 
         try {
@@ -83,7 +98,7 @@ export class HealthEventService {
             take: 1,
           });
 
-          const healthEvent = healthEvents[0]; // Chuyển phần tử đầu tiên ra ngoài
+          const healthEvent = healthEvents[0];
 
           if (!healthEvent) {
             throw new NotFoundException('No health event found');
