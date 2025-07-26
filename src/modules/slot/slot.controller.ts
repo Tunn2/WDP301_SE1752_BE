@@ -78,7 +78,6 @@ export class SlotController {
     );
   }
 
-  //when check, client send slot id and an image, fix below code
   @Patch(':id/check')
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
@@ -108,7 +107,7 @@ export class SlotController {
   }
 
   @Delete(':id')
-  async DeleteQueryBuilder(@Param('id') id: string) {
+  async deleteById(@Param('id') id: string) {
     return new ResponseDTO(
       200,
       true,

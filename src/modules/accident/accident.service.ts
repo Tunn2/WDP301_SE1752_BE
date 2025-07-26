@@ -14,12 +14,17 @@ import {
   getCurrentTimeInVietnam,
 } from 'src/common/utils/date.util';
 import { AccidentStatus } from 'src/common/enums/accident-status.enum';
+import { MailerService } from '@nestjs-modules/mailer';
+import { ParentStudent } from '../user/entities/parent-student.entity';
 
 @Injectable()
 export class AccidentService {
   constructor(
     @InjectRepository(Accident) private accidentRepo: Repository<Accident>,
     @InjectRepository(Student) private studentRepo: Repository<Student>,
+    @InjectRepository(ParentStudent)
+    private parentStudentRepo: Repository<ParentStudent>,
+    private mailerService: MailerService,
   ) {}
 
   async create(nurseId: string, request: CreateAccidentDto) {
@@ -37,9 +42,23 @@ export class AccidentService {
       student: { id: student.id },
       date: getCurrentTimeInVietnam(),
     });
-
     await this.accidentRepo.save(accident);
-
+    const parents = await this.parentStudentRepo.find({
+      where: { student },
+      relations: ['user'],
+    });
+    parents.forEach((parent) => {
+      this.mailerService.sendMail({
+        to: parent.user.email,
+        subject: 'Có sự cố với con bạn',
+        template: 'accident',
+        context: {
+          name: student.fullName,
+          date: accident.date,
+          description: accident.summary,
+        },
+      });
+    });
     return accident;
   }
 
