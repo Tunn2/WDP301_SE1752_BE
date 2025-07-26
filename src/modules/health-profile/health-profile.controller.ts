@@ -1,3 +1,6 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Body,
@@ -6,6 +9,7 @@ import {
   Param,
   Post,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { HealthProfileService } from './health-profile.service';
@@ -13,6 +17,7 @@ import { CreateHealthProfileDto } from './dto/create-health-profile.dto';
 import { ResponseDTO } from 'src/common/response-dto/response.dto';
 import { ApiBearerAuth, ApiBody, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
+import { Response } from 'express';
 
 @Controller('health-profile')
 export class HealthProfileController {
@@ -55,6 +60,26 @@ export class HealthProfileController {
       'Create health profile successfully',
       null,
     );
+  }
+  @Get('export-health-profiles/:studentId')
+  async exportHealthProfiles(
+    @Param('studentId') studentId: string,
+    @Res() res: Response,
+  ) {
+    const buffer =
+      await this.healthProfileService.exportHealthProfilesByStudentId(
+        studentId,
+      );
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=health-profile-${studentId}.xlsx`,
+    );
+    res.send(buffer);
   }
 
   @Get('student/:id/latest')

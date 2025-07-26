@@ -6,11 +6,12 @@ import { HealthProfile } from './entities/health-profile.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Student } from 'src/modules/student/entities/student.entity';
 import { JwtStrategy } from 'src/modules/auth/strategies/jwt.strategy';
+import { ExcelService } from '../excel/excel.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([HealthProfile, User, Student])],
   controllers: [HealthProfileController],
-  providers: [HealthProfileService, JwtStrategy],
+  providers: [HealthProfileService, JwtStrategy, ExcelService],
   exports: [HealthProfileService],
 })
 export class HealthProfileModule {}

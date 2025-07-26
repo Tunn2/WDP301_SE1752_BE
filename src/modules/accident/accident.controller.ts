@@ -5,7 +5,9 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -14,6 +16,7 @@ import { CreateAccidentDto } from './dto/create-accident.dto';
 import { ResponseDTO } from 'src/common/response-dto/response.dto';
 import { JwtAuthGuard } from 'src/modules/auth/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { AccidentStatus } from 'src/common/enums/accident-status.enum';
 
 @Controller('accident')
 export class AccidentController {
@@ -58,5 +61,23 @@ export class AccidentController {
       'Get accident by id successfully',
       await this.accidentService.findById(id),
     );
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({
+    summary: 'Cập nhật status theo id',
+  })
+  async updateStatusById(
+    @Param('id') id: string,
+    @Query('status') status: AccidentStatus,
+  ) {
+    {
+      return new ResponseDTO(
+        200,
+        true,
+        'Get accident by id successfully',
+        await this.accidentService.updateAccidentStatusById(id, status),
+      );
+    }
   }
 }

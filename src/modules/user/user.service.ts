@@ -78,6 +78,17 @@ export class UserService {
           dob: member['Ngày sinh'] || '',
         });
         await this.studentRepo.save(student);
+      } else {
+        await this.studentRepo.update(
+          { studentCode },
+          {
+            fullName: member['Họ tên'] || student.fullName,
+            address: member['Địa chỉ'] || student.address,
+            class: member['Lớp'] || student.class,
+            gender: member['Giới tính'] || student.gender,
+            dob: member['Ngày sinh'] || student.dob,
+          },
+        );
       }
 
       // Danh sách các mối quan hệ phụ huynh

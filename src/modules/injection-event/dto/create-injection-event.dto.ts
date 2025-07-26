@@ -7,7 +7,6 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 
-// Tạo validator tùy chỉnh
 @ValidatorConstraint({ name: 'isCloseDateValid', async: false })
 export class IsCloseDateValid implements ValidatorConstraintInterface {
   validate(closeDate: Date, args: any) {
@@ -39,4 +38,8 @@ export class CreateInjectionEventDto {
   @IsNumber()
   @ApiProperty({ example: 100000 })
   price: number;
+
+  // @IsNumber()
+  // @ApiProperty({ example: 5 })
+  // underGrade: number;
 }

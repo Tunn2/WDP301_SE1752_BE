@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import {
   BadRequestException,
   Injectable,
@@ -9,6 +12,8 @@ import { Repository } from 'typeorm';
 import { CreateVaccinationDto } from './dto/create-vaccination.dto';
 import { StudentVaccination } from './entities/student-vaccination.entity';
 import { CreateStudentVaccinationDto } from './dto/create-student-vaccination.dto';
+import { Student } from '../student/entities/student.entity';
+import { ExcelService } from '../excel/excel.service';
 
 @Injectable()
 export class VaccinationService {
@@ -17,6 +22,8 @@ export class VaccinationService {
     private vaccinationRepo: Repository<Vaccination>,
     @InjectRepository(StudentVaccination)
     private studentVaccinationRepo: Repository<StudentVaccination>,
+    @InjectRepository(Student) private studentRepo: Repository<Student>,
+    private readonly excelService: ExcelService,
   ) {}
 
   async findAll() {
@@ -75,5 +82,29 @@ export class VaccinationService {
       relations: ['vaccination'],
     });
     return studentVaccinations;
+  }
+
+  async exportVaccinationsByStudentId(studentId: string) {
+    const foundStudent = await this.studentRepo.findOne({
+      where: { id: studentId },
+      relations: ['studentVaccinations', 'studentVaccinations.vaccination'], // Sửa lại relations
+    });
+
+    if (!foundStudent) {
+      throw new NotFoundException('Student not found');
+    }
+
+    const data = foundStudent.studentVaccinations.map(
+      (studentVaccination, index) => ({
+        STT: index + 1,
+        'Mã học sinh': foundStudent.studentCode,
+        'Họ tên': foundStudent.fullName,
+        'Tên vaccine': studentVaccination.vaccination?.name || '',
+        'Loại vaccine': studentVaccination.vaccination?.type || '',
+        'Số liều': studentVaccination.doses,
+      }),
+    );
+
+    return this.excelService.exportToExcel(data);
   }
 }

@@ -13,6 +13,7 @@ import {
   formatToVietnamTime,
   getCurrentTimeInVietnam,
 } from 'src/common/utils/date.util';
+import { AccidentStatus } from 'src/common/enums/accident-status.enum';
 
 @Injectable()
 export class AccidentService {
@@ -60,5 +61,11 @@ export class AccidentService {
     });
     if (!accident) throw new NotFoundException('Accident not found');
     return accident;
+  }
+
+  async updateAccidentStatusById(id: string, status: AccidentStatus) {
+    const foundAccident = await this.findById(id);
+    foundAccident.status = status;
+    await this.accidentRepo.save(foundAccident);
   }
 }

@@ -102,8 +102,6 @@ export class PaymentService {
           'Content-Type': 'application/json',
         },
       });
-
-      // Trả về dữ liệu phản hồi từ MoMo (thường là URL để chuyển hướng đến trang thanh toán)
       return response.data.deeplink;
     } catch (error) {
       // Xử lý lỗi nếu có

@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Res } from '@nestjs/common';
 import { VaccinationService } from './vaccination.service';
 import { ResponseDTO } from 'src/common/response-dto/response.dto';
 import { CreateVaccinationDto } from './dto/create-vaccination.dto';
 import { CreateStudentVaccinationDto } from './dto/create-student-vaccination.dto';
 import { ApiOperation } from '@nestjs/swagger';
+import { Response } from 'express';
 
 @Controller('vaccination')
 export class VaccinationController {
@@ -57,5 +58,24 @@ export class VaccinationController {
       'Successfully',
       await this.vaccinationService.findByStudentId(studentId),
     );
+  }
+
+  @Get('export-health-profiles/:studentId')
+  async exportHealthProfiles(
+    @Param('studentId') studentId: string,
+    @Res() res: Response,
+  ) {
+    const buffer =
+      await this.vaccinationService.exportVaccinationsByStudentId(studentId);
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=vaccination-${studentId}.xlsx`,
+    );
+    res.send(buffer);
   }
 }

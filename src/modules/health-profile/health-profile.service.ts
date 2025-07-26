@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateHealthProfileDto } from './dto/create-health-profile.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HealthProfile } from './entities/health-profile.entity';
 import { Repository } from 'typeorm';
 import { Student } from 'src/modules/student/entities/student.entity';
-
 import { getCurrentTimeInVietnam } from 'src/common/utils/date.util';
+import { ExcelService } from '../excel/excel.service';
 
 @Injectable()
 export class HealthProfileService {
@@ -13,6 +14,7 @@ export class HealthProfileService {
     @InjectRepository(HealthProfile)
     private healthProfileRepo: Repository<HealthProfile>,
     @InjectRepository(Student) private studentRepo: Repository<Student>,
+    private readonly excelService: ExcelService,
   ) {}
 
   async createOne(request: CreateHealthProfileDto, userId: string) {
@@ -58,5 +60,32 @@ export class HealthProfileService {
       relations: ['student'],
     });
     return healthProfile;
+  }
+
+  async exportHealthProfilesByStudentId(studentId: string) {
+    const foundStudent = await this.studentRepo.findOne({
+      where: { id: studentId },
+      relations: ['healthProfiles'],
+    });
+
+    if (!foundStudent) {
+      throw new NotFoundException('Student not found');
+    }
+    const data = foundStudent.healthProfiles
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .map((profile, index) => ({
+        stt: index + 1,
+        examDate: new Date(profile.date).toLocaleDateString('vi-VN'),
+        weight: profile.weight,
+        height: profile.height,
+        bmi: (profile.weight / Math.pow(profile.height / 100, 2)).toFixed(1),
+        bloodType: profile.bloodType || '',
+        allergies: profile.allergies || '',
+        hearing: profile.hearing,
+        vision: profile.vision,
+        notes: profile.note || '',
+      }));
+
+    return this.excelService.exportToExcel(data);
   }
 }
