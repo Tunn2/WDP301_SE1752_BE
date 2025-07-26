@@ -169,6 +169,15 @@ export class InjectionEventService {
       if (!foundInjectionEvent)
         throw new BadRequestException('Injection event not found');
 
+      if (
+        !foundParentStudent.student.class?.startsWith(
+          foundInjectionEvent.grade.toString(),
+        )
+      ) {
+        throw new BadRequestException(
+          'Student is not in the correct grade for this event',
+        );
+      }
       const foundInjectionRecord = await this.injectionRecordRepo.findOne({
         where: {
           student: { id: studentId },

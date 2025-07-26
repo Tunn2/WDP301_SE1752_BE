@@ -79,6 +79,7 @@ export class SlotService {
           date: Between(getStartOfTodayInVietnam(), getEndOfTodayInVietnam()),
         },
         nurse: { id: nurseId },
+        isDeleted: false,
         session,
       },
       relations: ['medicineRequest.student', 'medicines'],
@@ -96,6 +97,20 @@ export class SlotService {
       {} as Record<string, Slot[]>,
     );
     return arrangedSlots;
+  }
+
+  async deleteById(id: string) {
+    const foundSlot = await this.findById(id);
+    foundSlot.isDeleted = true;
+    await this.slotRepo.save(foundSlot);
+  }
+
+  async findById(id: string) {
+    const foundSlot = await this.slotRepo.findOne({
+      where: { id: id, isDeleted: false },
+    });
+    if (!foundSlot) throw new Error('Slot not found');
+    return foundSlot;
   }
 
   async checkSlot(id: string, image: Express.Multer.File) {

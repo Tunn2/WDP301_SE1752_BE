@@ -26,6 +26,9 @@ export class Slot {
   @Column({ nullable: true })
   image: string;
 
+  @Column({ default: false })
+  isDeleted: boolean;
+
   @OneToMany(() => SlotMedicine, (slotMedicine) => slotMedicine.slot, {
     cascade: true,
   })

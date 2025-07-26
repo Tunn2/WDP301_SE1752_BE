@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -104,5 +105,15 @@ export class SlotController {
     }
     await this.slotService.checkSlot(id, image);
     return new ResponseDTO(200, true, 'Check slot successfully', null);
+  }
+
+  @Delete(':id')
+  async DeleteQueryBuilder(@Param('id') id: string) {
+    return new ResponseDTO(
+      200,
+      true,
+      'delete slot successfully',
+      await this.slotService.deleteById(id),
+    );
   }
 }
