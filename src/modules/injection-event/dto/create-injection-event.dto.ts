@@ -39,7 +39,7 @@ export class CreateInjectionEventDto {
   @ApiProperty({ example: 100000 })
   price: number;
 
-  // @IsNumber()
-  // @ApiProperty({ example: 5 })
-  // underGrade: number;
+  @IsNumber()
+  @ApiProperty({ example: 5 })
+  grade: number;
 }

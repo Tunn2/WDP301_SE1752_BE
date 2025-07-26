@@ -29,6 +29,9 @@ export class InjectionEvent {
   @ManyToOne(() => Vaccination, (vaccination) => vaccination.injectionEvents)
   vaccination: Vaccination;
 
+  @Column()
+  grade: number;
+
   @OneToMany(() => Transaction, (transaction) => transaction.injectionEvent)
   transactions: Transaction[];
 

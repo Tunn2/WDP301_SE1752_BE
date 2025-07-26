@@ -11,7 +11,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InjectionEvent } from './entities/injection-event.entity';
-import { In, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import {
+  Brackets,
+  In,
+  LessThanOrEqual,
+  MoreThanOrEqual,
+  Repository,
+} from 'typeorm';
 import {
   formatToVietnamTime,
   getCurrentTimeInVietnam,
@@ -64,19 +70,26 @@ export class InjectionEventService {
       registrationCloseDate: formatToVietnamTime(request.registrationCloseDate),
       price: foundVaccination.type == VaccinationType.FREE ? 0 : request.price,
       registrationOpenDate: formatToVietnamTime(request.registrationOpenDate),
+      grade: request.grade,
     });
 
     const studentsNotEnoughDoses = await this.studentRepo
       .createQueryBuilder('student')
       .leftJoin('student.studentVaccinations', 'studentVaccination')
-      .where('studentVaccination.doses < :requiredDoses', {
-        requiredDoses: foundVaccination.numberOfDoses,
+      .where('student.class LIKE :gradePattern', {
+        gradePattern: `${request.grade}%`,
       })
-      .orWhere('studentVaccination.id IS NULL')
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('studentVaccination.doses < :requiredDoses', {
+            requiredDoses: foundVaccination.numberOfDoses,
+          }).orWhere('studentVaccination.id IS NULL');
+        }),
+      )
       .select('student.id', 'id')
       .getRawMany();
-    const studentsJson = studentsNotEnoughDoses.map((record) => record.id);
 
+    const studentsJson = studentsNotEnoughDoses.map((record) => record.id);
     const parentStudents = await this.parentStudentRepo.find({
       where: { student: { id: In(studentsJson) } },
       relations: ['user'],
