@@ -165,6 +165,7 @@ export class UserService {
   async findParents() {
     return this.userRepo.find({
       where: { role: UserRole.PARENT },
+      relations: ['studentUsers', 'studentUsers.student'],
     });
   }
 }
