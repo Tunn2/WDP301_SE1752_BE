@@ -24,6 +24,7 @@ import {
 } from 'src/common/utils/date.util';
 import { EmailProducerService } from '../email/email.service';
 import { ChangeAppointmentTimeDto } from './dto/change-appointment-time.dto';
+import { MailerService } from '@nestjs-modules/mailer';
 
 dayjs.extend(customParseFormat);
 
@@ -38,6 +39,7 @@ export class AppointmentService {
     private userRepo: Repository<User>,
     private googleMeetService: GoogleMeetService,
     private emailService: EmailProducerService,
+    private mailerService: MailerService,
   ) {}
 
   async createAppointment(
@@ -83,6 +85,18 @@ export class AppointmentService {
         name: parent.fullName,
         appointmentTime: createAppointmentDto.appointmentTime.toString(),
         userId: parent.id,
+      });
+
+      this.mailerService.sendMail({
+        to: parent.email,
+        subject: 'Lịch hẹn',
+        template: 'appointment',
+        context: {
+          appointmentTime: createAppointmentDto.appointmentTime.toString(),
+          link: meetingData.data.meetingUri,
+          nurse: nurse.fullName,
+          purpose: createAppointmentDto.purpose,
+        },
       });
 
       const savedAppointment = await this.appointmentRepo.save(appointment);
