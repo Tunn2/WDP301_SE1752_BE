@@ -44,7 +44,7 @@ export class InjectionRecordService {
 
     const injectionRecords = await this.injectionRecordRepo.find({
       where: { student: { id: studentId } },
-      relations: ['injectionEvent'],
+      relations: ['injectionEvent', 'injectionEvent.vaccination'],
       order: { registrationDate: 'DESC' },
     });
     return injectionRecords;

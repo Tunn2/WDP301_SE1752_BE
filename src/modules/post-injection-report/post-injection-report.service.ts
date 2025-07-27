@@ -35,4 +35,12 @@ export class PostInjectionReportService {
   async findById(id: string) {
     return await this.reportRepo.findOne({ where: { id } });
   }
+
+  async findByInjectionEvent(injectionEventId: string) {
+    return await this.reportRepo.find({
+      where: { injectionRecord: { injectionEvent: { id: injectionEventId } } },
+      relations: ['createdBy', 'injectionRecord'],
+      order: { createdAt: 'DESC' },
+    });
+  }
 }

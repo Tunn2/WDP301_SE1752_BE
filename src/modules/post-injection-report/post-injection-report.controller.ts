@@ -36,6 +36,16 @@ export class PostInjectionReportController {
     );
   }
 
+  @Get('injection-event/:id')
+  async findByInjectionEventId(@Param(':id') id: string) {
+    return new ResponseDTO(
+      200,
+      true,
+      'Successfully',
+      await this.postInjectionReportService.findByInjectionEvent(id),
+    );
+  }
+
   @Get('injection-record/:id')
   async findByInjectionRecordId(@Param(':id') id: string) {
     return new ResponseDTO(
